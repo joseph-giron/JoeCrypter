@@ -19,7 +19,7 @@ SIGN = posign.exe#
 CCFLAGS = -std:C11 -Tx86-coff -Ot -Ob1 -fp:precise -W1 -Gz -Ze#
 ASFLAGS = -AIA32 -Gz#
 RCFLAGS = #
-LINKFLAGS = -subsystem:windows -machine:x86 -largeaddressaware -base:0x10000 kernel32.lib user32.lib gdi32.lib comctl32.lib comdlg32.lib winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib#
+LINKFLAGS = -subsystem:windows -machine:x86 -largeaddressaware -base:0x10000 kernel32.lib user32.lib gdi32.lib comctl32.lib comdlg32.lib winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib Rpcrt4.lib#
 SIGNFLAGS = -timeurl:http://timestamp.verisign.com/scripts/timstamp.dll -location:CU -store:MY -errkill#
 INCLUDE = $(PellesCDir)\Include\Win;$(PellesCDir)\Include#
 LIB = $(PellesCDir)\Lib\Win;$(PellesCDir)\Lib#
@@ -48,6 +48,6 @@ output\payload.res: \
 	res\pload.joe
 	$(RC) $(RCFLAGS) "$!" -Fo"$@"
 
-.EXCLUDEDFILES:
-
 .SILENT:
+
+.EXCLUDEDFILES:

