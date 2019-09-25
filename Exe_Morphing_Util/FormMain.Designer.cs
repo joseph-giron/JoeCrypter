@@ -60,6 +60,7 @@
             this.cbCores = new System.Windows.Forms.CheckBox();
             this.cbAntiEmu = new System.Windows.Forms.CheckBox();
             this.cbFakeWindows = new System.Windows.Forms.CheckBox();
+            this.cbSpecialStall = new System.Windows.Forms.CheckBox();
             this.cbLongStall = new System.Windows.Forms.CheckBox();
             this.cbAntiVM = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
@@ -83,7 +84,7 @@
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.rbUnpackMeth1 = new System.Windows.Forms.RadioButton();
             this.rbUnpackMeth2 = new System.Windows.Forms.RadioButton();
-            this.cbSpecialStall = new System.Windows.Forms.CheckBox();
+            this.cbFakeExports = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -322,6 +323,7 @@
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.cbFakeExports);
             this.groupBox2.Controls.Add(this.cbRegion);
             this.groupBox2.Controls.Add(this.dtp);
             this.groupBox2.Controls.Add(this.cbRegionSpecific);
@@ -451,6 +453,16 @@
             this.cbFakeWindows.TabIndex = 3;
             this.cbFakeWindows.Text = "Fake Windows";
             this.cbFakeWindows.UseVisualStyleBackColor = true;
+            // 
+            // cbSpecialStall
+            // 
+            this.cbSpecialStall.AutoSize = true;
+            this.cbSpecialStall.Location = new System.Drawing.Point(196, 93);
+            this.cbSpecialStall.Name = "cbSpecialStall";
+            this.cbSpecialStall.Size = new System.Drawing.Size(98, 17);
+            this.cbSpecialStall.TabIndex = 3;
+            this.cbSpecialStall.Text = "Special Stalling";
+            this.cbSpecialStall.UseVisualStyleBackColor = true;
             // 
             // cbLongStall
             // 
@@ -704,15 +716,15 @@
             this.rbUnpackMeth2.Text = "Transactional";
             this.rbUnpackMeth2.UseVisualStyleBackColor = true;
             // 
-            // cbSpecialStall
+            // cbFakeExports
             // 
-            this.cbSpecialStall.AutoSize = true;
-            this.cbSpecialStall.Location = new System.Drawing.Point(196, 93);
-            this.cbSpecialStall.Name = "cbSpecialStall";
-            this.cbSpecialStall.Size = new System.Drawing.Size(98, 17);
-            this.cbSpecialStall.TabIndex = 3;
-            this.cbSpecialStall.Text = "Special Stalling";
-            this.cbSpecialStall.UseVisualStyleBackColor = true;
+            this.cbFakeExports.AutoSize = true;
+            this.cbFakeExports.Location = new System.Drawing.Point(196, 70);
+            this.cbFakeExports.Name = "cbFakeExports";
+            this.cbFakeExports.Size = new System.Drawing.Size(88, 17);
+            this.cbFakeExports.TabIndex = 9;
+            this.cbFakeExports.Text = "Fake Exports";
+            this.cbFakeExports.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
@@ -805,6 +817,7 @@
         private System.Windows.Forms.CheckBox cbTLS;
         private System.Windows.Forms.CheckBox cbDetectIdle;
         private System.Windows.Forms.CheckBox cbSpecialStall;
+        private System.Windows.Forms.CheckBox cbFakeExports;
     }
 }
 
