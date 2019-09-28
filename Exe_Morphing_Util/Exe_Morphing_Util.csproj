@@ -51,7 +51,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>cool.ico</ApplicationIcon>
+    <ApplicationIcon>wjhfhf.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -111,6 +111,7 @@
   <ItemGroup>
     <Content Include="63dabf311.ico" />
     <Content Include="cool.ico" />
+    <Content Include="wjhfhf.ico" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="WMPLib">

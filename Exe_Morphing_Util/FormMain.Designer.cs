@@ -52,6 +52,7 @@
             this.cbResourceChars = new System.Windows.Forms.CheckBox();
             this.cbNullMZ = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.cbFakeExports = new System.Windows.Forms.CheckBox();
             this.cbRegion = new System.Windows.Forms.ComboBox();
             this.dtp = new System.Windows.Forms.DateTimePicker();
             this.cbRegionSpecific = new System.Windows.Forms.CheckBox();
@@ -84,7 +85,7 @@
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.rbUnpackMeth1 = new System.Windows.Forms.RadioButton();
             this.rbUnpackMeth2 = new System.Windows.Forms.RadioButton();
-            this.cbFakeExports = new System.Windows.Forms.CheckBox();
+            this.cbTestSigning = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -95,7 +96,7 @@
             // 
             // btnMorph
             // 
-            this.btnMorph.Location = new System.Drawing.Point(10, 528);
+            this.btnMorph.Location = new System.Drawing.Point(182, 536);
             this.btnMorph.Name = "btnMorph";
             this.btnMorph.Size = new System.Drawing.Size(304, 28);
             this.btnMorph.TabIndex = 2;
@@ -110,7 +111,7 @@
             this.tbfilehere.Name = "tbfilehere";
             this.tbfilehere.ReadOnly = true;
             this.tbfilehere.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbfilehere.Size = new System.Drawing.Size(610, 24);
+            this.tbfilehere.Size = new System.Drawing.Size(646, 24);
             this.tbfilehere.TabIndex = 1;
             // 
             // pictureBox1
@@ -118,7 +119,7 @@
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.Location = new System.Drawing.Point(10, 27);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(609, 184);
+            this.pictureBox1.Size = new System.Drawing.Size(646, 184);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
@@ -337,16 +338,27 @@
             this.groupBox2.Controls.Add(this.cbAntiDebug);
             this.groupBox2.Controls.Add(this.cbAntiEmu);
             this.groupBox2.Controls.Add(this.cbFakeWindows);
+            this.groupBox2.Controls.Add(this.cbTestSigning);
             this.groupBox2.Controls.Add(this.cbSpecialStall);
             this.groupBox2.Controls.Add(this.cbLongStall);
             this.groupBox2.Controls.Add(this.cbAntiVM);
             this.groupBox2.Controls.Add(this.cbNuma);
             this.groupBox2.Location = new System.Drawing.Point(320, 246);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(299, 196);
+            this.groupBox2.Size = new System.Drawing.Size(336, 196);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "AV / Sandbox Evasion Options";
+            // 
+            // cbFakeExports
+            // 
+            this.cbFakeExports.AutoSize = true;
+            this.cbFakeExports.Location = new System.Drawing.Point(207, 70);
+            this.cbFakeExports.Name = "cbFakeExports";
+            this.cbFakeExports.Size = new System.Drawing.Size(88, 17);
+            this.cbFakeExports.TabIndex = 9;
+            this.cbFakeExports.Text = "Fake Exports";
+            this.cbFakeExports.UseVisualStyleBackColor = true;
             // 
             // cbRegion
             // 
@@ -427,7 +439,7 @@
             // cbCores
             // 
             this.cbCores.AutoSize = true;
-            this.cbCores.Location = new System.Drawing.Point(196, 46);
+            this.cbCores.Location = new System.Drawing.Point(207, 46);
             this.cbCores.Name = "cbCores";
             this.cbCores.Size = new System.Drawing.Size(87, 17);
             this.cbCores.TabIndex = 3;
@@ -447,7 +459,7 @@
             // cbFakeWindows
             // 
             this.cbFakeWindows.AutoSize = true;
-            this.cbFakeWindows.Location = new System.Drawing.Point(196, 23);
+            this.cbFakeWindows.Location = new System.Drawing.Point(207, 23);
             this.cbFakeWindows.Name = "cbFakeWindows";
             this.cbFakeWindows.Size = new System.Drawing.Size(97, 17);
             this.cbFakeWindows.TabIndex = 3;
@@ -457,7 +469,7 @@
             // cbSpecialStall
             // 
             this.cbSpecialStall.AutoSize = true;
-            this.cbSpecialStall.Location = new System.Drawing.Point(196, 93);
+            this.cbSpecialStall.Location = new System.Drawing.Point(207, 93);
             this.cbSpecialStall.Name = "cbSpecialStall";
             this.cbSpecialStall.Size = new System.Drawing.Size(98, 17);
             this.cbSpecialStall.TabIndex = 3;
@@ -494,7 +506,7 @@
             this.groupBox3.Controls.Add(this.rbUPX);
             this.groupBox3.Location = new System.Drawing.Point(10, 446);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(304, 78);
+            this.groupBox3.Size = new System.Drawing.Size(304, 84);
             this.groupBox3.TabIndex = 10;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Packing Options";
@@ -574,7 +586,7 @@
             this.mymenustrip.Location = new System.Drawing.Point(0, 0);
             this.mymenustrip.Name = "mymenustrip";
             this.mymenustrip.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
-            this.mymenustrip.Size = new System.Drawing.Size(631, 24);
+            this.mymenustrip.Size = new System.Drawing.Size(668, 24);
             this.mymenustrip.TabIndex = 12;
             this.mymenustrip.Text = "mymenu";
             // 
@@ -636,7 +648,7 @@
             this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox4.Size = new System.Drawing.Size(293, 110);
+            this.groupBox4.Size = new System.Drawing.Size(329, 85);
             this.groupBox4.TabIndex = 13;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Internal Unpacking Method";
@@ -716,21 +728,21 @@
             this.rbUnpackMeth2.Text = "Transactional";
             this.rbUnpackMeth2.UseVisualStyleBackColor = true;
             // 
-            // cbFakeExports
+            // cbTestSigning
             // 
-            this.cbFakeExports.AutoSize = true;
-            this.cbFakeExports.Location = new System.Drawing.Point(196, 70);
-            this.cbFakeExports.Name = "cbFakeExports";
-            this.cbFakeExports.Size = new System.Drawing.Size(88, 17);
-            this.cbFakeExports.TabIndex = 9;
-            this.cbFakeExports.Text = "Fake Exports";
-            this.cbFakeExports.UseVisualStyleBackColor = true;
+            this.cbTestSigning.AutoSize = true;
+            this.cbTestSigning.Location = new System.Drawing.Point(207, 116);
+            this.cbTestSigning.Name = "cbTestSigning";
+            this.cbTestSigning.Size = new System.Drawing.Size(119, 17);
+            this.cbTestSigning.TabIndex = 3;
+            this.cbTestSigning.Text = "Check Test Signing";
+            this.cbTestSigning.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(631, 562);
+            this.ClientSize = new System.Drawing.Size(668, 567);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
@@ -818,6 +830,7 @@
         private System.Windows.Forms.CheckBox cbDetectIdle;
         private System.Windows.Forms.CheckBox cbSpecialStall;
         private System.Windows.Forms.CheckBox cbFakeExports;
+        private System.Windows.Forms.CheckBox cbTestSigning;
     }
 }
 
