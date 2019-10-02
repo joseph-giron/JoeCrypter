@@ -1,3 +1,5 @@
+![Alt text](/screenshot.png?raw=true "Main Window")
+
 This is for educational purposes only.
 To use, run it from the debug folder.
 
