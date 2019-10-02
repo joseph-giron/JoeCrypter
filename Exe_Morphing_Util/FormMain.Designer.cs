@@ -61,6 +61,7 @@
             this.cbCores = new System.Windows.Forms.CheckBox();
             this.cbAntiEmu = new System.Windows.Forms.CheckBox();
             this.cbFakeWindows = new System.Windows.Forms.CheckBox();
+            this.cbTestSigning = new System.Windows.Forms.CheckBox();
             this.cbSpecialStall = new System.Windows.Forms.CheckBox();
             this.cbLongStall = new System.Windows.Forms.CheckBox();
             this.cbAntiVM = new System.Windows.Forms.CheckBox();
@@ -84,8 +85,8 @@
             this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.rbUnpackMeth1 = new System.Windows.Forms.RadioButton();
-            this.rbUnpackMeth2 = new System.Windows.Forms.RadioButton();
-            this.cbTestSigning = new System.Windows.Forms.CheckBox();
+            this.rbTransactional = new System.Windows.Forms.RadioButton();
+            this.rbJustExtract = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -466,6 +467,16 @@
             this.cbFakeWindows.Text = "Fake Windows";
             this.cbFakeWindows.UseVisualStyleBackColor = true;
             // 
+            // cbTestSigning
+            // 
+            this.cbTestSigning.AutoSize = true;
+            this.cbTestSigning.Location = new System.Drawing.Point(207, 116);
+            this.cbTestSigning.Name = "cbTestSigning";
+            this.cbTestSigning.Size = new System.Drawing.Size(119, 17);
+            this.cbTestSigning.TabIndex = 3;
+            this.cbTestSigning.Text = "Check Test Signing";
+            this.cbTestSigning.UseVisualStyleBackColor = true;
+            // 
             // cbSpecialStall
             // 
             this.cbSpecialStall.AutoSize = true;
@@ -640,10 +651,11 @@
             // 
             this.groupBox4.Controls.Add(this.cbTLS);
             this.groupBox4.Controls.Add(this.radioButton2);
+            this.groupBox4.Controls.Add(this.rbJustExtract);
             this.groupBox4.Controls.Add(this.radioButton3);
             this.groupBox4.Controls.Add(this.radioButton1);
             this.groupBox4.Controls.Add(this.rbUnpackMeth1);
-            this.groupBox4.Controls.Add(this.rbUnpackMeth2);
+            this.groupBox4.Controls.Add(this.rbTransactional);
             this.groupBox4.Location = new System.Drawing.Point(327, 446);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox4.Name = "groupBox4";
@@ -681,7 +693,7 @@
             // 
             this.radioButton3.AutoSize = true;
             this.radioButton3.Enabled = false;
-            this.radioButton3.Location = new System.Drawing.Point(190, 17);
+            this.radioButton3.Location = new System.Drawing.Point(195, 17);
             this.radioButton3.Margin = new System.Windows.Forms.Padding(2);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.Size = new System.Drawing.Size(89, 17);
@@ -715,28 +727,31 @@
             this.rbUnpackMeth1.Text = "Proc Hollowing";
             this.rbUnpackMeth1.UseVisualStyleBackColor = true;
             // 
-            // rbUnpackMeth2
+            // rbTransactional
             // 
-            this.rbUnpackMeth2.AutoSize = true;
-            this.rbUnpackMeth2.Enabled = false;
-            this.rbUnpackMeth2.Location = new System.Drawing.Point(100, 17);
-            this.rbUnpackMeth2.Margin = new System.Windows.Forms.Padding(2);
-            this.rbUnpackMeth2.Name = "rbUnpackMeth2";
-            this.rbUnpackMeth2.Size = new System.Drawing.Size(89, 17);
-            this.rbUnpackMeth2.TabIndex = 0;
-            this.rbUnpackMeth2.TabStop = true;
-            this.rbUnpackMeth2.Text = "Transactional";
-            this.rbUnpackMeth2.UseVisualStyleBackColor = true;
+            this.rbTransactional.AutoSize = true;
+            this.rbTransactional.Enabled = false;
+            this.rbTransactional.Location = new System.Drawing.Point(100, 17);
+            this.rbTransactional.Margin = new System.Windows.Forms.Padding(2);
+            this.rbTransactional.Name = "rbTransactional";
+            this.rbTransactional.Size = new System.Drawing.Size(89, 17);
+            this.rbTransactional.TabIndex = 0;
+            this.rbTransactional.TabStop = true;
+            this.rbTransactional.Text = "Transactional";
+            this.rbTransactional.UseVisualStyleBackColor = true;
             // 
-            // cbTestSigning
+            // rbJustExtract
             // 
-            this.cbTestSigning.AutoSize = true;
-            this.cbTestSigning.Location = new System.Drawing.Point(207, 116);
-            this.cbTestSigning.Name = "cbTestSigning";
-            this.cbTestSigning.Size = new System.Drawing.Size(119, 17);
-            this.cbTestSigning.TabIndex = 3;
-            this.cbTestSigning.Text = "Check Test Signing";
-            this.cbTestSigning.UseVisualStyleBackColor = true;
+            this.rbJustExtract.AutoSize = true;
+            this.rbJustExtract.Enabled = false;
+            this.rbJustExtract.Location = new System.Drawing.Point(195, 39);
+            this.rbJustExtract.Margin = new System.Windows.Forms.Padding(2);
+            this.rbJustExtract.Name = "rbJustExtract";
+            this.rbJustExtract.Size = new System.Drawing.Size(80, 17);
+            this.rbJustExtract.TabIndex = 1;
+            this.rbJustExtract.TabStop = true;
+            this.rbJustExtract.Text = "Just Extract";
+            this.rbJustExtract.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 
@@ -821,7 +836,7 @@
         private System.Windows.Forms.ComboBox cbRegion;
         private System.Windows.Forms.GroupBox groupBox4;
         private System.Windows.Forms.RadioButton rbUnpackMeth1;
-        private System.Windows.Forms.RadioButton rbUnpackMeth2;
+        private System.Windows.Forms.RadioButton rbTransactional;
         private System.Windows.Forms.RadioButton radioButton2;
         private System.Windows.Forms.RadioButton radioButton1;
         private System.Windows.Forms.RadioButton radioButton3;
@@ -831,6 +846,7 @@
         private System.Windows.Forms.CheckBox cbSpecialStall;
         private System.Windows.Forms.CheckBox cbFakeExports;
         private System.Windows.Forms.CheckBox cbTestSigning;
+        private System.Windows.Forms.RadioButton rbJustExtract;
     }
 }
 

