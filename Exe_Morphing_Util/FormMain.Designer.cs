@@ -82,11 +82,11 @@
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.cbTLS = new System.Windows.Forms.CheckBox();
             this.radioButton2 = new System.Windows.Forms.RadioButton();
+            this.rbJustExtract = new System.Windows.Forms.RadioButton();
             this.radioButton3 = new System.Windows.Forms.RadioButton();
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.rbUnpackMeth1 = new System.Windows.Forms.RadioButton();
             this.rbTransactional = new System.Windows.Forms.RadioButton();
-            this.rbJustExtract = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -689,11 +689,23 @@
             this.radioButton2.Text = "Create Section";
             this.radioButton2.UseVisualStyleBackColor = true;
             // 
+            // rbJustExtract
+            // 
+            this.rbJustExtract.AutoSize = true;
+            this.rbJustExtract.Location = new System.Drawing.Point(100, 17);
+            this.rbJustExtract.Margin = new System.Windows.Forms.Padding(2);
+            this.rbJustExtract.Name = "rbJustExtract";
+            this.rbJustExtract.Size = new System.Drawing.Size(80, 17);
+            this.rbJustExtract.TabIndex = 1;
+            this.rbJustExtract.TabStop = true;
+            this.rbJustExtract.Text = "Just Extract";
+            this.rbJustExtract.UseVisualStyleBackColor = true;
+            // 
             // radioButton3
             // 
             this.radioButton3.AutoSize = true;
             this.radioButton3.Enabled = false;
-            this.radioButton3.Location = new System.Drawing.Point(195, 17);
+            this.radioButton3.Location = new System.Drawing.Point(198, 39);
             this.radioButton3.Margin = new System.Windows.Forms.Padding(2);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.Size = new System.Drawing.Size(89, 17);
@@ -730,8 +742,7 @@
             // rbTransactional
             // 
             this.rbTransactional.AutoSize = true;
-            this.rbTransactional.Enabled = false;
-            this.rbTransactional.Location = new System.Drawing.Point(100, 17);
+            this.rbTransactional.Location = new System.Drawing.Point(198, 17);
             this.rbTransactional.Margin = new System.Windows.Forms.Padding(2);
             this.rbTransactional.Name = "rbTransactional";
             this.rbTransactional.Size = new System.Drawing.Size(89, 17);
@@ -739,19 +750,6 @@
             this.rbTransactional.TabStop = true;
             this.rbTransactional.Text = "Transactional";
             this.rbTransactional.UseVisualStyleBackColor = true;
-            // 
-            // rbJustExtract
-            // 
-            this.rbJustExtract.AutoSize = true;
-            this.rbJustExtract.Enabled = false;
-            this.rbJustExtract.Location = new System.Drawing.Point(195, 39);
-            this.rbJustExtract.Margin = new System.Windows.Forms.Padding(2);
-            this.rbJustExtract.Name = "rbJustExtract";
-            this.rbJustExtract.Size = new System.Drawing.Size(80, 17);
-            this.rbJustExtract.TabIndex = 1;
-            this.rbJustExtract.TabStop = true;
-            this.rbJustExtract.Text = "Just Extract";
-            this.rbJustExtract.UseVisualStyleBackColor = true;
             // 
             // FormMain
             // 

