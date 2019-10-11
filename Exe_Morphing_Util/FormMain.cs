@@ -924,7 +924,7 @@ namespace Exe_Morphing_Util
             switch (which) // set file stream POS based on what file was chosen
             {
                 case 1:
-                    fs.Seek(2416, SeekOrigin.Begin);
+                    fs.Seek(2591, SeekOrigin.Begin);
                     break;
                 case 2:
                     fs.Seek(2090, SeekOrigin.Begin);
