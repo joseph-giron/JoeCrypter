@@ -7,5 +7,5 @@
 LANGUAGE LANG_ENGLISH,SUBLANG_ENGLISH_US
 
 8001 RCDATA "res\\pload.joe"
-8002 RCDATA "res\\transactional.joe"
+//8002 RCDATA "res\\transactional.joe"
 
