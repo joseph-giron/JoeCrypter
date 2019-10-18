@@ -39,12 +39,9 @@
             this.cbSpecial = new System.Windows.Forms.CheckBox();
             this.cbAntiDebug = new System.Windows.Forms.CheckBox();
             this.cbNuma = new System.Windows.Forms.CheckBox();
-            this.rbConvBP2NOP = new System.Windows.Forms.RadioButton();
-            this.rbConvBP2XCHG = new System.Windows.Forms.RadioButton();
-            this.rbConvBP2FNOP = new System.Windows.Forms.RadioButton();
-            this.rbBP2WAIT = new System.Windows.Forms.RadioButton();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.tbJunkBytes = new System.Windows.Forms.TextBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.comboConvert = new System.Windows.Forms.ComboBox();
             this.cbPEChar = new System.Windows.Forms.CheckBox();
             this.cbRandomSectionNames = new System.Windows.Forms.CheckBox();
             this.cbTimeStamp = new System.Windows.Forms.CheckBox();
@@ -61,17 +58,14 @@
             this.cbCores = new System.Windows.Forms.CheckBox();
             this.cbAntiEmu = new System.Windows.Forms.CheckBox();
             this.cbFakeWindows = new System.Windows.Forms.CheckBox();
+            this.cbSwitchDesktops = new System.Windows.Forms.CheckBox();
+            this.cbProcMon = new System.Windows.Forms.CheckBox();
             this.cbTestSigning = new System.Windows.Forms.CheckBox();
             this.cbSpecialStall = new System.Windows.Forms.CheckBox();
             this.cbLongStall = new System.Windows.Forms.CheckBox();
             this.cbAntiVM = new System.Windows.Forms.CheckBox();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.rbNone = new System.Windows.Forms.RadioButton();
-            this.rbKkrunchy = new System.Windows.Forms.RadioButton();
-            this.rbCExe = new System.Windows.Forms.RadioButton();
-            this.rbMPRESS = new System.Windows.Forms.RadioButton();
-            this.rbXPack = new System.Windows.Forms.RadioButton();
-            this.rbUPX = new System.Windows.Forms.RadioButton();
+            this.comboPacker = new System.Windows.Forms.ComboBox();
             this.mymenustrip = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadExeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -87,39 +81,17 @@
             this.radioButton1 = new System.Windows.Forms.RadioButton();
             this.rbUnpackMeth1 = new System.Windows.Forms.RadioButton();
             this.rbTransactional = new System.Windows.Forms.RadioButton();
-            this.groupBox5 = new System.Windows.Forms.GroupBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
-            this.checkBox2 = new System.Windows.Forms.CheckBox();
-            this.checkBox3 = new System.Windows.Forms.CheckBox();
-            this.checkBox4 = new System.Windows.Forms.CheckBox();
-            this.checkBox5 = new System.Windows.Forms.CheckBox();
-            this.checkBox6 = new System.Windows.Forms.CheckBox();
-            this.checkBox7 = new System.Windows.Forms.CheckBox();
-            this.checkBox8 = new System.Windows.Forms.CheckBox();
-            this.checkBox9 = new System.Windows.Forms.CheckBox();
-            this.checkBox10 = new System.Windows.Forms.CheckBox();
-            this.checkBox11 = new System.Windows.Forms.CheckBox();
-            this.checkBox12 = new System.Windows.Forms.CheckBox();
-            this.cbSwitchDesktops = new System.Windows.Forms.CheckBox();
-            this.checkBox13 = new System.Windows.Forms.CheckBox();
-            this.checkBox14 = new System.Windows.Forms.CheckBox();
-            this.checkBox15 = new System.Windows.Forms.CheckBox();
-            this.checkBox16 = new System.Windows.Forms.CheckBox();
-            this.checkBox17 = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.groupBox3.SuspendLayout();
             this.mymenustrip.SuspendLayout();
             this.groupBox4.SuspendLayout();
-            this.groupBox5.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnMorph
             // 
-            this.btnMorph.Location = new System.Drawing.Point(182, 536);
+            this.btnMorph.Location = new System.Drawing.Point(149, 536);
             this.btnMorph.Name = "btnMorph";
             this.btnMorph.Size = new System.Drawing.Size(304, 28);
             this.btnMorph.TabIndex = 2;
@@ -134,7 +106,7 @@
             this.tbfilehere.Name = "tbfilehere";
             this.tbfilehere.ReadOnly = true;
             this.tbfilehere.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.tbfilehere.Size = new System.Drawing.Size(646, 24);
+            this.tbfilehere.Size = new System.Drawing.Size(583, 24);
             this.tbfilehere.TabIndex = 1;
             // 
             // pictureBox1
@@ -142,7 +114,7 @@
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.Location = new System.Drawing.Point(10, 27);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(646, 184);
+            this.pictureBox1.Size = new System.Drawing.Size(583, 184);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
@@ -213,77 +185,45 @@
             this.cbNuma.Text = "NUMA trick";
             this.cbNuma.UseVisualStyleBackColor = true;
             // 
-            // rbConvBP2NOP
-            // 
-            this.rbConvBP2NOP.AutoSize = true;
-            this.rbConvBP2NOP.Location = new System.Drawing.Point(16, 24);
-            this.rbConvBP2NOP.Name = "rbConvBP2NOP";
-            this.rbConvBP2NOP.Size = new System.Drawing.Size(129, 17);
-            this.rbConvBP2NOP.TabIndex = 8;
-            this.rbConvBP2NOP.TabStop = true;
-            this.rbConvBP2NOP.Text = "Convert BP\'s to NOPs";
-            this.rbConvBP2NOP.UseVisualStyleBackColor = true;
-            // 
-            // rbConvBP2XCHG
-            // 
-            this.rbConvBP2XCHG.AutoSize = true;
-            this.rbConvBP2XCHG.Location = new System.Drawing.Point(16, 46);
-            this.rbConvBP2XCHG.Name = "rbConvBP2XCHG";
-            this.rbConvBP2XCHG.Size = new System.Drawing.Size(131, 17);
-            this.rbConvBP2XCHG.TabIndex = 8;
-            this.rbConvBP2XCHG.TabStop = true;
-            this.rbConvBP2XCHG.Text = "Convert BP\'s to XCHG";
-            this.rbConvBP2XCHG.UseVisualStyleBackColor = true;
-            // 
-            // rbConvBP2FNOP
-            // 
-            this.rbConvBP2FNOP.AutoSize = true;
-            this.rbConvBP2FNOP.Location = new System.Drawing.Point(154, 23);
-            this.rbConvBP2FNOP.Name = "rbConvBP2FNOP";
-            this.rbConvBP2FNOP.Size = new System.Drawing.Size(137, 17);
-            this.rbConvBP2FNOP.TabIndex = 8;
-            this.rbConvBP2FNOP.TabStop = true;
-            this.rbConvBP2FNOP.Text = "Convert BP\'s to FNOP\'s";
-            this.rbConvBP2FNOP.UseVisualStyleBackColor = true;
-            // 
-            // rbBP2WAIT
-            // 
-            this.rbBP2WAIT.AutoSize = true;
-            this.rbBP2WAIT.Location = new System.Drawing.Point(154, 46);
-            this.rbBP2WAIT.Name = "rbBP2WAIT";
-            this.rbBP2WAIT.Size = new System.Drawing.Size(136, 17);
-            this.rbBP2WAIT.TabIndex = 8;
-            this.rbBP2WAIT.TabStop = true;
-            this.rbBP2WAIT.Text = "Convert BP\'s to WAIT\'s";
-            this.rbBP2WAIT.UseVisualStyleBackColor = true;
-            // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.tbJunkBytes);
-            this.groupBox1.Controls.Add(this.rbConvBP2NOP);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.comboConvert);
             this.groupBox1.Controls.Add(this.cbPEChar);
-            this.groupBox1.Controls.Add(this.rbConvBP2XCHG);
             this.groupBox1.Controls.Add(this.cbRandomSectionNames);
-            this.groupBox1.Controls.Add(this.rbBP2WAIT);
             this.groupBox1.Controls.Add(this.cbTimeStamp);
-            this.groupBox1.Controls.Add(this.rbConvBP2FNOP);
             this.groupBox1.Controls.Add(this.cbJunkBytes);
             this.groupBox1.Controls.Add(this.cbResourceChars);
             this.groupBox1.Controls.Add(this.cbNullMZ);
             this.groupBox1.Location = new System.Drawing.Point(8, 246);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(306, 196);
+            this.groupBox1.Size = new System.Drawing.Size(201, 196);
             this.groupBox1.TabIndex = 9;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Morph Options";
             // 
-            // tbJunkBytes
+            // label1
             // 
-            this.tbJunkBytes.Location = new System.Drawing.Point(164, 98);
-            this.tbJunkBytes.Multiline = true;
-            this.tbJunkBytes.Name = "tbJunkBytes";
-            this.tbJunkBytes.Size = new System.Drawing.Size(136, 88);
-            this.tbJunkBytes.TabIndex = 16;
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(6, 23);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(53, 13);
+            this.label1.TabIndex = 17;
+            this.label1.Text = "Convert...";
+            // 
+            // comboConvert
+            // 
+            this.comboConvert.FormattingEnabled = true;
+            this.comboConvert.Items.AddRange(new object[] {
+            "None",
+            "Breakpoints (0xCC) to NOP\'s",
+            "Breakpoints (0xCC) to FNOP\'s",
+            "Breakpoints (0xCC) to XCHG",
+            "Breakpoints (0xCC) to WAIT\'s"});
+            this.comboConvert.Location = new System.Drawing.Point(65, 21);
+            this.comboConvert.Name = "comboConvert";
+            this.comboConvert.Size = new System.Drawing.Size(126, 21);
+            this.comboConvert.TabIndex = 14;
             // 
             // cbPEChar
             // 
@@ -318,7 +258,7 @@
             // cbJunkBytes
             // 
             this.cbJunkBytes.AutoSize = true;
-            this.cbJunkBytes.Location = new System.Drawing.Point(164, 75);
+            this.cbJunkBytes.Location = new System.Drawing.Point(6, 52);
             this.cbJunkBytes.Name = "cbJunkBytes";
             this.cbJunkBytes.Size = new System.Drawing.Size(128, 17);
             this.cbJunkBytes.TabIndex = 11;
@@ -361,14 +301,16 @@
             this.groupBox2.Controls.Add(this.cbAntiDebug);
             this.groupBox2.Controls.Add(this.cbAntiEmu);
             this.groupBox2.Controls.Add(this.cbFakeWindows);
+            this.groupBox2.Controls.Add(this.cbSwitchDesktops);
+            this.groupBox2.Controls.Add(this.cbProcMon);
             this.groupBox2.Controls.Add(this.cbTestSigning);
             this.groupBox2.Controls.Add(this.cbSpecialStall);
             this.groupBox2.Controls.Add(this.cbLongStall);
             this.groupBox2.Controls.Add(this.cbAntiVM);
             this.groupBox2.Controls.Add(this.cbNuma);
-            this.groupBox2.Location = new System.Drawing.Point(320, 246);
+            this.groupBox2.Location = new System.Drawing.Point(215, 246);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(336, 196);
+            this.groupBox2.Size = new System.Drawing.Size(378, 196);
             this.groupBox2.TabIndex = 9;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "AV / Sandbox Evasion Options";
@@ -376,7 +318,7 @@
             // cbFakeExports
             // 
             this.cbFakeExports.AutoSize = true;
-            this.cbFakeExports.Location = new System.Drawing.Point(207, 70);
+            this.cbFakeExports.Location = new System.Drawing.Point(243, 70);
             this.cbFakeExports.Name = "cbFakeExports";
             this.cbFakeExports.Size = new System.Drawing.Size(88, 17);
             this.cbFakeExports.TabIndex = 9;
@@ -416,7 +358,7 @@
             this.cbRegion.Location = new System.Drawing.Point(107, 164);
             this.cbRegion.Margin = new System.Windows.Forms.Padding(2);
             this.cbRegion.Name = "cbRegion";
-            this.cbRegion.Size = new System.Drawing.Size(131, 21);
+            this.cbRegion.Size = new System.Drawing.Size(123, 21);
             this.cbRegion.TabIndex = 8;
             // 
             // dtp
@@ -462,7 +404,7 @@
             // cbCores
             // 
             this.cbCores.AutoSize = true;
-            this.cbCores.Location = new System.Drawing.Point(207, 46);
+            this.cbCores.Location = new System.Drawing.Point(243, 46);
             this.cbCores.Name = "cbCores";
             this.cbCores.Size = new System.Drawing.Size(87, 17);
             this.cbCores.TabIndex = 3;
@@ -482,17 +424,37 @@
             // cbFakeWindows
             // 
             this.cbFakeWindows.AutoSize = true;
-            this.cbFakeWindows.Location = new System.Drawing.Point(207, 23);
+            this.cbFakeWindows.Location = new System.Drawing.Point(243, 23);
             this.cbFakeWindows.Name = "cbFakeWindows";
             this.cbFakeWindows.Size = new System.Drawing.Size(97, 17);
             this.cbFakeWindows.TabIndex = 3;
             this.cbFakeWindows.Text = "Fake Windows";
             this.cbFakeWindows.UseVisualStyleBackColor = true;
             // 
+            // cbSwitchDesktops
+            // 
+            this.cbSwitchDesktops.AutoSize = true;
+            this.cbSwitchDesktops.Location = new System.Drawing.Point(243, 162);
+            this.cbSwitchDesktops.Name = "cbSwitchDesktops";
+            this.cbSwitchDesktops.Size = new System.Drawing.Size(106, 17);
+            this.cbSwitchDesktops.TabIndex = 3;
+            this.cbSwitchDesktops.Text = "Switch Desktops";
+            this.cbSwitchDesktops.UseVisualStyleBackColor = true;
+            // 
+            // cbProcMon
+            // 
+            this.cbProcMon.AutoSize = true;
+            this.cbProcMon.Location = new System.Drawing.Point(243, 139);
+            this.cbProcMon.Name = "cbProcMon";
+            this.cbProcMon.Size = new System.Drawing.Size(102, 17);
+            this.cbProcMon.TabIndex = 3;
+            this.cbProcMon.Text = "Procmon Check";
+            this.cbProcMon.UseVisualStyleBackColor = true;
+            // 
             // cbTestSigning
             // 
             this.cbTestSigning.AutoSize = true;
-            this.cbTestSigning.Location = new System.Drawing.Point(207, 116);
+            this.cbTestSigning.Location = new System.Drawing.Point(243, 116);
             this.cbTestSigning.Name = "cbTestSigning";
             this.cbTestSigning.Size = new System.Drawing.Size(119, 17);
             this.cbTestSigning.TabIndex = 3;
@@ -502,7 +464,7 @@
             // cbSpecialStall
             // 
             this.cbSpecialStall.AutoSize = true;
-            this.cbSpecialStall.Location = new System.Drawing.Point(207, 93);
+            this.cbSpecialStall.Location = new System.Drawing.Point(243, 93);
             this.cbSpecialStall.Name = "cbSpecialStall";
             this.cbSpecialStall.Size = new System.Drawing.Size(98, 17);
             this.cbSpecialStall.TabIndex = 3;
@@ -531,84 +493,28 @@
             // 
             // groupBox3
             // 
-            this.groupBox3.Controls.Add(this.rbNone);
-            this.groupBox3.Controls.Add(this.rbKkrunchy);
-            this.groupBox3.Controls.Add(this.rbCExe);
-            this.groupBox3.Controls.Add(this.rbMPRESS);
-            this.groupBox3.Controls.Add(this.rbXPack);
-            this.groupBox3.Controls.Add(this.rbUPX);
+            this.groupBox3.Controls.Add(this.comboPacker);
             this.groupBox3.Location = new System.Drawing.Point(10, 446);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(304, 84);
+            this.groupBox3.Size = new System.Drawing.Size(200, 85);
             this.groupBox3.TabIndex = 10;
             this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Packing Options";
+            this.groupBox3.Text = "Pre-Packer Options";
             // 
-            // rbNone
+            // comboPacker
             // 
-            this.rbNone.AutoSize = true;
-            this.rbNone.Location = new System.Drawing.Point(168, 43);
-            this.rbNone.Name = "rbNone";
-            this.rbNone.Size = new System.Drawing.Size(83, 17);
-            this.rbNone.TabIndex = 9;
-            this.rbNone.TabStop = true;
-            this.rbNone.Text = "None (clear)";
-            this.rbNone.UseVisualStyleBackColor = true;
-            // 
-            // rbKkrunchy
-            // 
-            this.rbKkrunchy.AutoSize = true;
-            this.rbKkrunchy.Location = new System.Drawing.Point(96, 41);
-            this.rbKkrunchy.Name = "rbKkrunchy";
-            this.rbKkrunchy.Size = new System.Drawing.Size(70, 17);
-            this.rbKkrunchy.TabIndex = 9;
-            this.rbKkrunchy.TabStop = true;
-            this.rbKkrunchy.Text = "Kkrunchy";
-            this.rbKkrunchy.UseVisualStyleBackColor = true;
-            // 
-            // rbCExe
-            // 
-            this.rbCExe.AutoSize = true;
-            this.rbCExe.Location = new System.Drawing.Point(96, 20);
-            this.rbCExe.Name = "rbCExe";
-            this.rbCExe.Size = new System.Drawing.Size(50, 17);
-            this.rbCExe.TabIndex = 9;
-            this.rbCExe.TabStop = true;
-            this.rbCExe.Text = "CExe";
-            this.rbCExe.UseVisualStyleBackColor = true;
-            // 
-            // rbMPRESS
-            // 
-            this.rbMPRESS.AutoSize = true;
-            this.rbMPRESS.Location = new System.Drawing.Point(14, 43);
-            this.rbMPRESS.Name = "rbMPRESS";
-            this.rbMPRESS.Size = new System.Drawing.Size(70, 17);
-            this.rbMPRESS.TabIndex = 9;
-            this.rbMPRESS.TabStop = true;
-            this.rbMPRESS.Text = "MPRESS";
-            this.rbMPRESS.UseVisualStyleBackColor = true;
-            // 
-            // rbXPack
-            // 
-            this.rbXPack.AutoSize = true;
-            this.rbXPack.Location = new System.Drawing.Point(169, 19);
-            this.rbXPack.Name = "rbXPack";
-            this.rbXPack.Size = new System.Drawing.Size(60, 17);
-            this.rbXPack.TabIndex = 9;
-            this.rbXPack.TabStop = true;
-            this.rbXPack.Text = "XPACK";
-            this.rbXPack.UseVisualStyleBackColor = true;
-            // 
-            // rbUPX
-            // 
-            this.rbUPX.AutoSize = true;
-            this.rbUPX.Location = new System.Drawing.Point(14, 20);
-            this.rbUPX.Name = "rbUPX";
-            this.rbUPX.Size = new System.Drawing.Size(47, 17);
-            this.rbUPX.TabIndex = 9;
-            this.rbUPX.TabStop = true;
-            this.rbUPX.Text = "UPX";
-            this.rbUPX.UseVisualStyleBackColor = true;
+            this.comboPacker.FormattingEnabled = true;
+            this.comboPacker.Items.AddRange(new object[] {
+            "None",
+            "UPX",
+            "CExe",
+            "XPACK",
+            "MPRESS",
+            "Kkrunchy"});
+            this.comboPacker.Location = new System.Drawing.Point(3, 19);
+            this.comboPacker.Name = "comboPacker";
+            this.comboPacker.Size = new System.Drawing.Size(191, 21);
+            this.comboPacker.TabIndex = 10;
             // 
             // mymenustrip
             // 
@@ -619,7 +525,7 @@
             this.mymenustrip.Location = new System.Drawing.Point(0, 0);
             this.mymenustrip.Name = "mymenustrip";
             this.mymenustrip.Padding = new System.Windows.Forms.Padding(4, 2, 0, 2);
-            this.mymenustrip.Size = new System.Drawing.Size(668, 24);
+            this.mymenustrip.Size = new System.Drawing.Size(603, 24);
             this.mymenustrip.TabIndex = 12;
             this.mymenustrip.Text = "mymenu";
             // 
@@ -678,11 +584,11 @@
             this.groupBox4.Controls.Add(this.radioButton1);
             this.groupBox4.Controls.Add(this.rbUnpackMeth1);
             this.groupBox4.Controls.Add(this.rbTransactional);
-            this.groupBox4.Location = new System.Drawing.Point(327, 446);
+            this.groupBox4.Location = new System.Drawing.Point(215, 446);
             this.groupBox4.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox4.Size = new System.Drawing.Size(329, 85);
+            this.groupBox4.Size = new System.Drawing.Size(371, 85);
             this.groupBox4.TabIndex = 13;
             this.groupBox4.TabStop = false;
             this.groupBox4.Text = "Internal Unpacking Method";
@@ -773,269 +679,13 @@
             this.rbTransactional.Text = "Transactional";
             this.rbTransactional.UseVisualStyleBackColor = true;
             // 
-            // groupBox5
-            // 
-            this.groupBox5.Controls.Add(this.checkBox1);
-            this.groupBox5.Controls.Add(this.comboBox1);
-            this.groupBox5.Controls.Add(this.dateTimePicker1);
-            this.groupBox5.Controls.Add(this.checkBox2);
-            this.groupBox5.Controls.Add(this.checkBox3);
-            this.groupBox5.Controls.Add(this.checkBox4);
-            this.groupBox5.Controls.Add(this.checkBox5);
-            this.groupBox5.Controls.Add(this.checkBox6);
-            this.groupBox5.Controls.Add(this.checkBox7);
-            this.groupBox5.Controls.Add(this.checkBox8);
-            this.groupBox5.Controls.Add(this.checkBox9);
-            this.groupBox5.Controls.Add(this.checkBox10);
-            this.groupBox5.Controls.Add(this.checkBox11);
-            this.groupBox5.Controls.Add(this.checkBox12);
-            this.groupBox5.Controls.Add(this.cbSwitchDesktops);
-            this.groupBox5.Controls.Add(this.checkBox13);
-            this.groupBox5.Controls.Add(this.checkBox14);
-            this.groupBox5.Controls.Add(this.checkBox15);
-            this.groupBox5.Controls.Add(this.checkBox16);
-            this.groupBox5.Controls.Add(this.checkBox17);
-            this.groupBox5.Location = new System.Drawing.Point(320, 246);
-            this.groupBox5.Name = "groupBox5";
-            this.groupBox5.Size = new System.Drawing.Size(336, 196);
-            this.groupBox5.TabIndex = 9;
-            this.groupBox5.TabStop = false;
-            this.groupBox5.Text = "AV / Sandbox Evasion Options";
-            // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(209, 70);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(88, 17);
-            this.checkBox1.TabIndex = 9;
-            this.checkBox1.Text = "Fake Exports";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "Russia",
-            "United Kingdom",
-            "United States",
-            "Japan",
-            "China",
-            "Iraq",
-            "Iran",
-            "Syria",
-            "Israel",
-            "Mexico",
-            "Venezuela",
-            "Brazil",
-            "India",
-            "Indonesia",
-            "North Korea",
-            "South Korea",
-            "Pakistan",
-            "Saudi Arabia",
-            "Afghanistan",
-            "Canada",
-            "Cuba",
-            "Hong Kong SAR",
-            "Australia",
-            "New Zealand ",
-            "Netherlands",
-            "Norway"});
-            this.comboBox1.Location = new System.Drawing.Point(107, 164);
-            this.comboBox1.Margin = new System.Windows.Forms.Padding(2);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(131, 21);
-            this.comboBox1.TabIndex = 8;
-            // 
-            // dateTimePicker1
-            // 
-            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePicker1.Location = new System.Drawing.Point(6, 165);
-            this.dateTimePicker1.Margin = new System.Windows.Forms.Padding(2);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(86, 20);
-            this.dateTimePicker1.TabIndex = 6;
-            // 
-            // checkBox2
-            // 
-            this.checkBox2.AutoSize = true;
-            this.checkBox2.Location = new System.Drawing.Point(108, 140);
-            this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(101, 17);
-            this.checkBox2.TabIndex = 5;
-            this.checkBox2.Text = "Region Specific";
-            this.checkBox2.UseVisualStyleBackColor = true;
-            // 
-            // checkBox3
-            // 
-            this.checkBox3.AutoSize = true;
-            this.checkBox3.Location = new System.Drawing.Point(6, 140);
-            this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(90, 17);
-            this.checkBox3.TabIndex = 4;
-            this.checkBox3.Text = "Date Specific";
-            this.checkBox3.UseVisualStyleBackColor = true;
-            // 
-            // checkBox4
-            // 
-            this.checkBox4.AutoSize = true;
-            this.checkBox4.Location = new System.Drawing.Point(6, 23);
-            this.checkBox4.Name = "checkBox4";
-            this.checkBox4.Size = new System.Drawing.Size(80, 17);
-            this.checkBox4.TabIndex = 3;
-            this.checkBox4.Text = "Malloc trick";
-            this.checkBox4.UseVisualStyleBackColor = true;
-            // 
-            // checkBox5
-            // 
-            this.checkBox5.AutoSize = true;
-            this.checkBox5.Enabled = false;
-            this.checkBox5.Location = new System.Drawing.Point(6, 116);
-            this.checkBox5.Name = "checkBox5";
-            this.checkBox5.Size = new System.Drawing.Size(78, 17);
-            this.checkBox5.TabIndex = 3;
-            this.checkBox5.Text = "Detect Idle";
-            this.checkBox5.UseVisualStyleBackColor = true;
-            // 
-            // checkBox6
-            // 
-            this.checkBox6.AutoSize = true;
-            this.checkBox6.Location = new System.Drawing.Point(209, 46);
-            this.checkBox6.Name = "checkBox6";
-            this.checkBox6.Size = new System.Drawing.Size(87, 17);
-            this.checkBox6.TabIndex = 3;
-            this.checkBox6.Text = "Check Cores";
-            this.checkBox6.UseVisualStyleBackColor = true;
-            // 
-            // checkBox7
-            // 
-            this.checkBox7.AutoSize = true;
-            this.checkBox7.Location = new System.Drawing.Point(108, 23);
-            this.checkBox7.Name = "checkBox7";
-            this.checkBox7.Size = new System.Drawing.Size(68, 17);
-            this.checkBox7.TabIndex = 3;
-            this.checkBox7.Text = "FLS trick";
-            this.checkBox7.UseVisualStyleBackColor = true;
-            // 
-            // checkBox8
-            // 
-            this.checkBox8.AutoSize = true;
-            this.checkBox8.Location = new System.Drawing.Point(108, 46);
-            this.checkBox8.Name = "checkBox8";
-            this.checkBox8.Size = new System.Drawing.Size(89, 17);
-            this.checkBox8.TabIndex = 3;
-            this.checkBox8.Text = "ProcMemInfo";
-            this.checkBox8.UseVisualStyleBackColor = true;
-            // 
-            // checkBox9
-            // 
-            this.checkBox9.AutoSize = true;
-            this.checkBox9.Location = new System.Drawing.Point(6, 46);
-            this.checkBox9.Name = "checkBox9";
-            this.checkBox9.Size = new System.Drawing.Size(88, 17);
-            this.checkBox9.TabIndex = 3;
-            this.checkBox9.Text = "Joe\'s Special";
-            this.checkBox9.UseVisualStyleBackColor = true;
-            // 
-            // checkBox10
-            // 
-            this.checkBox10.AutoSize = true;
-            this.checkBox10.Location = new System.Drawing.Point(108, 69);
-            this.checkBox10.Name = "checkBox10";
-            this.checkBox10.Size = new System.Drawing.Size(79, 17);
-            this.checkBox10.TabIndex = 3;
-            this.checkBox10.Text = "Anti-Debug";
-            this.checkBox10.UseVisualStyleBackColor = true;
-            // 
-            // checkBox11
-            // 
-            this.checkBox11.AutoSize = true;
-            this.checkBox11.Location = new System.Drawing.Point(108, 116);
-            this.checkBox11.Name = "checkBox11";
-            this.checkBox11.Size = new System.Drawing.Size(93, 17);
-            this.checkBox11.TabIndex = 3;
-            this.checkBox11.Text = "Anti-Emulation";
-            this.checkBox11.UseVisualStyleBackColor = true;
-            // 
-            // checkBox12
-            // 
-            this.checkBox12.AutoSize = true;
-            this.checkBox12.Location = new System.Drawing.Point(209, 23);
-            this.checkBox12.Name = "checkBox12";
-            this.checkBox12.Size = new System.Drawing.Size(97, 17);
-            this.checkBox12.TabIndex = 3;
-            this.checkBox12.Text = "Fake Windows";
-            this.checkBox12.UseVisualStyleBackColor = true;
-            // 
-            // cbSwitchDesktops
-            // 
-            this.cbSwitchDesktops.AutoSize = true;
-            this.cbSwitchDesktops.Location = new System.Drawing.Point(209, 139);
-            this.cbSwitchDesktops.Name = "cbSwitchDesktops";
-            this.cbSwitchDesktops.Size = new System.Drawing.Size(106, 17);
-            this.cbSwitchDesktops.TabIndex = 3;
-            this.cbSwitchDesktops.Text = "Switch Desktops";
-            this.cbSwitchDesktops.UseVisualStyleBackColor = true;
-            // 
-            // checkBox13
-            // 
-            this.checkBox13.AutoSize = true;
-            this.checkBox13.Location = new System.Drawing.Point(209, 116);
-            this.checkBox13.Name = "checkBox13";
-            this.checkBox13.Size = new System.Drawing.Size(119, 17);
-            this.checkBox13.TabIndex = 3;
-            this.checkBox13.Text = "Check Test Signing";
-            this.checkBox13.UseVisualStyleBackColor = true;
-            // 
-            // checkBox14
-            // 
-            this.checkBox14.AutoSize = true;
-            this.checkBox14.Location = new System.Drawing.Point(209, 93);
-            this.checkBox14.Name = "checkBox14";
-            this.checkBox14.Size = new System.Drawing.Size(98, 17);
-            this.checkBox14.TabIndex = 3;
-            this.checkBox14.Text = "Special Stalling";
-            this.checkBox14.UseVisualStyleBackColor = true;
-            // 
-            // checkBox15
-            // 
-            this.checkBox15.AutoSize = true;
-            this.checkBox15.Location = new System.Drawing.Point(108, 93);
-            this.checkBox15.Name = "checkBox15";
-            this.checkBox15.Size = new System.Drawing.Size(73, 17);
-            this.checkBox15.TabIndex = 3;
-            this.checkBox15.Text = "Long Stall";
-            this.checkBox15.UseVisualStyleBackColor = true;
-            // 
-            // checkBox16
-            // 
-            this.checkBox16.AutoSize = true;
-            this.checkBox16.Location = new System.Drawing.Point(6, 93);
-            this.checkBox16.Name = "checkBox16";
-            this.checkBox16.Size = new System.Drawing.Size(102, 17);
-            this.checkBox16.TabIndex = 3;
-            this.checkBox16.Text = "Anti-VM Checks";
-            this.checkBox16.UseVisualStyleBackColor = true;
-            // 
-            // checkBox17
-            // 
-            this.checkBox17.AutoSize = true;
-            this.checkBox17.Location = new System.Drawing.Point(6, 69);
-            this.checkBox17.Name = "checkBox17";
-            this.checkBox17.Size = new System.Drawing.Size(81, 17);
-            this.checkBox17.TabIndex = 3;
-            this.checkBox17.Text = "NUMA trick";
-            this.checkBox17.UseVisualStyleBackColor = true;
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(668, 567);
+            this.ClientSize = new System.Drawing.Size(603, 567);
             this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox5);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.pictureBox1);
@@ -1045,7 +695,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.mymenustrip;
             this.Name = "FormMain";
-            this.Text = "AV Testing Utility";
+            this.Text = "JoeCrypter";
             this.Load += new System.EventHandler(this.FormMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox1.ResumeLayout(false);
@@ -1053,13 +703,10 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
             this.mymenustrip.ResumeLayout(false);
             this.mymenustrip.PerformLayout();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
-            this.groupBox5.ResumeLayout(false);
-            this.groupBox5.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1077,12 +724,7 @@
         private System.Windows.Forms.CheckBox cbSpecial;
         private System.Windows.Forms.CheckBox cbAntiDebug;
         private System.Windows.Forms.CheckBox cbNuma;
-        private System.Windows.Forms.RadioButton rbConvBP2NOP;
-        private System.Windows.Forms.RadioButton rbConvBP2XCHG;
-        private System.Windows.Forms.RadioButton rbConvBP2FNOP;
-        private System.Windows.Forms.RadioButton rbBP2WAIT;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.TextBox tbJunkBytes;
         private System.Windows.Forms.CheckBox cbPEChar;
         private System.Windows.Forms.CheckBox cbRandomSectionNames;
         private System.Windows.Forms.CheckBox cbTimeStamp;
@@ -1091,12 +733,6 @@
         private System.Windows.Forms.CheckBox cbNullMZ;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox groupBox3;
-        private System.Windows.Forms.RadioButton rbCExe;
-        private System.Windows.Forms.RadioButton rbMPRESS;
-        private System.Windows.Forms.RadioButton rbUPX;
-        private System.Windows.Forms.RadioButton rbKkrunchy;
-        private System.Windows.Forms.RadioButton rbXPack;
-        private System.Windows.Forms.RadioButton rbNone;
         private System.Windows.Forms.CheckBox cbAntiEmu;
         private System.Windows.Forms.CheckBox cbFakeWindows;
         private System.Windows.Forms.CheckBox cbLongStall;
@@ -1125,27 +761,11 @@
         private System.Windows.Forms.CheckBox cbFakeExports;
         private System.Windows.Forms.CheckBox cbTestSigning;
         private System.Windows.Forms.RadioButton rbJustExtract;
-        private System.Windows.Forms.GroupBox groupBox5;
-        private System.Windows.Forms.CheckBox checkBox1;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
-        private System.Windows.Forms.CheckBox checkBox2;
-        private System.Windows.Forms.CheckBox checkBox3;
-        private System.Windows.Forms.CheckBox checkBox4;
-        private System.Windows.Forms.CheckBox checkBox5;
-        private System.Windows.Forms.CheckBox checkBox6;
-        private System.Windows.Forms.CheckBox checkBox7;
-        private System.Windows.Forms.CheckBox checkBox8;
-        private System.Windows.Forms.CheckBox checkBox9;
-        private System.Windows.Forms.CheckBox checkBox10;
-        private System.Windows.Forms.CheckBox checkBox11;
-        private System.Windows.Forms.CheckBox checkBox12;
         private System.Windows.Forms.CheckBox cbSwitchDesktops;
-        private System.Windows.Forms.CheckBox checkBox13;
-        private System.Windows.Forms.CheckBox checkBox14;
-        private System.Windows.Forms.CheckBox checkBox15;
-        private System.Windows.Forms.CheckBox checkBox16;
-        private System.Windows.Forms.CheckBox checkBox17;
+        private System.Windows.Forms.CheckBox cbProcMon;
+        private System.Windows.Forms.ComboBox comboPacker;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox comboConvert;
     }
 }
 

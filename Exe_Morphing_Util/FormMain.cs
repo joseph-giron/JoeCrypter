@@ -35,8 +35,6 @@ namespace Exe_Morphing_Util
             return new string(buffer);
         }
 
-
-
         private string[] str_psapi_funcs = new string[]
         {
             "GetProcessMemoryInfo"
@@ -89,26 +87,35 @@ namespace Exe_Morphing_Util
         }
         private void PackerOptions()
         {
-            if (rbCExe.Checked)
+            //1 UPX
+            //2 CExe
+            //3 XPACK
+            //4 MPRESS
+            //5 Kkrunchy
+            switch (comboPacker.SelectedIndex)
             {
-                cexepack();
+                case 0:
+                    
+                    break;
+                case 1:
+                    upxpack();
+                    break;
+                case 2:
+                    cexepack();
+                    break;
+                case 3:
+                    xpack();
+                    break;
+                case 4:
+                    mpresspack();
+                    break;
+                case 5:
+                    kkrunchypack();
+                    break;
+
             }
-            if (rbKkrunchy.Checked)
-            {
-                kkrunchypack();
-            }
-            if (rbMPRESS.Checked)
-            {
-                mpresspack();
-            }
-            if (rbUPX.Checked)
-            {
-                upxpack();
-            }
-            if (rbXPack.Checked)
-            {
-                xpack();
-            }
+
+            
         }
         private void xpack()
         {
@@ -174,11 +181,7 @@ namespace Exe_Morphing_Util
                 MessageBox.Show("Error, no file loaded", "Error");
                 return;
             }
-            if (cbJunkBytes.Checked && tbJunkBytes.Text == "")
-            {
-                    MessageBox.Show("Missing Junk Chars!","Error!");
-                    return;
-            }
+
             bgw.RunWorkerAsync();
             
             
@@ -283,16 +286,12 @@ namespace Exe_Morphing_Util
         public void InsertJunkBytes(string path)
         {
             FileStream fs = new FileStream(path, FileMode.Append);
-            string junkbytes = tbJunkBytes.Text;
-            
-            // From string to byte array
-            byte[] buffer = Encoding.ASCII.GetBytes(junkbytes);
+            byte[] buffer = Encoding.ASCII.GetBytes(RandomString(200));
             for (int x = 0; x < 200; x++)
             {
                 fs.Write(buffer, 0, buffer.Length);
             }
             fs.Close();
-            
         }
         public void AddPEChari(string path) // wacky logic to set PE characteristics, supports 32 and 64 bit
         {
@@ -590,21 +589,27 @@ namespace Exe_Morphing_Util
             {
                 InsertJunkBytes(file_gonna_mess_with);
             }
-            if (rbConvBP2NOP.Checked)
+            switch (comboConvert.SelectedIndex)
             {
-                ConvertBPs2Nops(file_gonna_mess_with);
-            }
-            if (rbConvBP2XCHG.Checked)
-            {
-                ConvertBPs2FNops(file_gonna_mess_with);
-            }
-            if (rbConvBP2XCHG.Checked)
-            {
-                ConvertBPs2Xchg(file_gonna_mess_with);
-            }
-            if (rbBP2WAIT.Checked)
-            {
-                ConvertBPs2WAITs(file_gonna_mess_with);
+                //0 None
+                //1 Breakpoints(0xCC) to NOP's
+                //2 Breakpoints(0xCC) to FNOP's
+                //3 Breakpoints(0xCC) to XCHG
+                //4 Breakpoints(0xCC) to WAIT's
+                case 0: // none
+                    break;
+                case 1:
+                    ConvertBPs2Nops(file_gonna_mess_with);
+                    break;
+                case 2:
+                    ConvertBPs2FNops(file_gonna_mess_with);
+                    break;
+                case 3:
+                    ConvertBPs2Xchg(file_gonna_mess_with);
+                    break;
+                case 4:
+                    ConvertBPs2WAITs(file_gonna_mess_with);
+                    break;
             }
 
             // Pack last
@@ -624,7 +629,7 @@ namespace Exe_Morphing_Util
                 File.Delete("\\output_dir\\gogopowerrangers.exe");
             }
             if (File.Exists("\\builder\\transactional_exe.exe"))
-                File.Decrypt("\\builder\\transactional_exe.exe");
+                File.Delete("\\builder\\transactional_exe.exe");
             // why not base64 it FIRST, then encrypt it when its in that format, THEN decrypt to b64 and run?
             // no, ENCRYPT FIRST
             // THEN BASE64 ENCODE for storage
@@ -686,7 +691,7 @@ namespace Exe_Morphing_Util
                 {
                     File.Copy("barebones\\dont_touch_me_TLS_callbacks_Transactional.joe", "builder\\joe_crypter.c", true);
                 }
-                else
+                else if(rbUnpackMeth1.Checked)
                 {   // not these 2? process hollowing is default
                     File.Copy("barebones\\dont_touch_me_TLS_callbacks.joe", "builder\\joe_crypter.c", true); 
                 }
@@ -709,13 +714,16 @@ namespace Exe_Morphing_Util
 
                 // now we do our evasions
 
-                fs.Seek(2024, SeekOrigin.Begin);
+                fs.Seek(2055, SeekOrigin.Begin);
 
                 if(cbSwitchDesktops.Checked)
                 {
                     sw.WriteLine("switchthedesktops();");
                 }
-
+                if(cbProcMon.Checked)
+                {
+                    sw.WriteLine("AntiProcMon();");
+                }
                 if (cbTestSigning.Checked)
                 {
                     sw.WriteLine("TestSigningCheck();");
@@ -918,7 +926,7 @@ namespace Exe_Morphing_Util
                 which = 2;
                 File.Copy("barebones\\dont_touch_me_Transactional.joe", "builder\\joe_crypter.c", true);
             }
-            else
+            else if(rbUnpackMeth1.Checked)
             {
                 which = 3;
                 File.Copy("barebones\\dont_touch_me.joe", "builder\\joe_crypter.c", true);
@@ -949,13 +957,13 @@ namespace Exe_Morphing_Util
             switch (which) // set file stream POS based on what file was chosen
             {
                 case 1:
-                    fs.Seek(2591, SeekOrigin.Begin);
+                    fs.Seek(2447, SeekOrigin.Begin);
                     break;
                 case 2:
-                    fs.Seek(2090, SeekOrigin.Begin);
+                    fs.Seek(2121, SeekOrigin.Begin);
                     break;
                 case 3:
-                    fs.Seek(2090, SeekOrigin.Begin);
+                    fs.Seek(2121, SeekOrigin.Begin);
                     break;
             }
 
@@ -963,7 +971,10 @@ namespace Exe_Morphing_Util
             {
                 sw.WriteLine("switchthedesktops();");
             }
-
+            if (cbProcMon.Checked)
+            {
+                sw.WriteLine("AntiProcMon();");
+            }
             if (cbTestSigning.Checked)
             {
                 sw.WriteLine("TestSigningCheck();");
@@ -1592,14 +1603,9 @@ namespace Exe_Morphing_Util
         {
             FormMain.CheckForIllegalCrossThreadCalls = false;
             rbUnpackMeth1.Checked = true;
-            //lbRegion.SelectedItem = 7;
+            cbRegion.SelectedIndex = 2;
             dtp.Value = dtp.Value.AddDays(7);
             WMPLib.WindowsMediaPlayer player = new WMPLib.WindowsMediaPlayer();
-            // WMPLib.IWMPPlaylist pl = null;
-            // pl = player.newPlaylist("kek", Application.StartupPath);
-            // pl.appendItem(player.newMedia(Application.StartupPath + "\\ayy.mp3"));
-            // pl.appendItem(player.newMedia(Application.StartupPath + "\\vvvvvv.mp3"));
-            // player.currentPlaylist = pl;
             if (devmode == false)
             {
                 player.settings.setMode("loop", true);
@@ -1614,16 +1620,9 @@ namespace Exe_Morphing_Util
             // XPACK - http://soft-lab.de/JoKo/
             // MEW - http://web.archive.org/web/20070831063728/http://northfox.uw.hu/index.php?lang=eng&id=dev
 
-            //for the compiler to work, we need to have both the xml file and the environment variables set as well
-            
-            // create batch file
-            // what if i create a batch file for compilation and include the set variables in there???
             
             if (Environment.GetEnvironmentVariable("PellesCDir") == null)
             {
-                // FUCK
-                
-
                 StreamWriter sw = new StreamWriter(Application.StartupPath + "\\compiler\\bin\\env.bat");
                 sw.WriteLine("@echo off");
                 sw.WriteLine("set PellesCDir=" + Application.StartupPath + "\\compiler");
@@ -1638,11 +1637,8 @@ namespace Exe_Morphing_Util
                 batfile.WindowStyle = ProcessWindowStyle.Hidden;
                 Process.Start(batfile);
             }
-            
-
 
         }
-
 
        public void encryptpayload(string filename) // encryted by random key, set at startup.
         {
@@ -1708,12 +1704,6 @@ namespace Exe_Morphing_Util
         {
             AboutForm af = new AboutForm();
             af.Show();
-        }
-
-        private void debugToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            
-
         }
 
         private void turnOffMusicToolStripMenuItem_Click(object sender, EventArgs e)

