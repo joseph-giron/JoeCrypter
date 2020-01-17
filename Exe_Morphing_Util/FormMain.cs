@@ -553,6 +553,15 @@ namespace Exe_Morphing_Util
             return new string (buffer);
         }
 
+        private static bool is64bit(string exe)
+        {
+            PeHeaderReader per = new PeHeaderReader(exe);
+            if (per.Is32BitHeader)
+                return false;
+            else
+                return true;
+        }
+
 
         private void bgw_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -565,6 +574,7 @@ namespace Exe_Morphing_Util
                 MessageBox.Show("Error, file is not an EXE!", "Error");
                 return;
             }
+            
             if (cbNullMZ.Checked)
             {
                 NullifyMZHeader(file_gonna_mess_with);
