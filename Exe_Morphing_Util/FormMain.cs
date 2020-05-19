@@ -20,6 +20,7 @@ namespace Exe_Morphing_Util
         
         public int payloadcryptkey, transactionalkey;
         bool devmode = true;
+        
 
         private static string RandomStringJustChars(int size) // C demands things start with chars not numbers for function names
         {
@@ -181,14 +182,15 @@ namespace Exe_Morphing_Util
                 MessageBox.Show("Error, no file loaded", "Error");
                 return;
             }
-            if(rbTransactional.Checked)
-            {
-                if(!is64bit(tbfilehere.Text))
-                {
-                    MessageBox.Show("Error, binary MUST be 64 bit or else it won't work with Transactional injection. Blame Microsoft.", "Error");
-                    return;
+            
+                if (rbTransactional.Checked)
+                 {
+                     if(!is64bit(tbfilehere.Text))
+                     {
+                        MessageBox.Show("Error, binary MUST be 64 bit or else it won't work with Transactional injection. Blame Microsoft.", "Error");
+                        return;
+                     }
                 }
-            }
 
             bgw.RunWorkerAsync();
             
@@ -219,77 +221,160 @@ namespace Exe_Morphing_Util
         }
 
         public void RandomSectionNames(string path)
-        { 
+        {
             PeHeaderReader lolpe = new PeHeaderReader(path);
-            int numberofsections = lolpe.FileHeader.NumberOfSections;
-            FileStream fs = new FileStream(path, FileMode.Open);
-            BinaryReader br = new BinaryReader(fs);
-            BinaryWriter bw = new BinaryWriter(fs);
-            fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
-            int my_e_lfanew = br.ReadInt32();
-            fs.Seek(my_e_lfanew + 248, SeekOrigin.Begin);
-
-            for (int x = 0; x < numberofsections; x++)
+            if (lolpe.FileHeader.Machine == 0x014C) // 32 bit
             {
-                byte[] NewSectionName = Encoding.ASCII.GetBytes(RandomString(8));
-                bw.Write(NewSectionName);
-                // section names 32 bytes apart
-                fs.Seek(32,SeekOrigin.Current);
+                
+                int numberofsections = lolpe.FileHeader.NumberOfSections;
+                FileStream fs = new FileStream(path, FileMode.Open);
+                BinaryReader br = new BinaryReader(fs);
+                BinaryWriter bw = new BinaryWriter(fs);
+                fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
+                int my_e_lfanew = br.ReadInt32();
+                fs.Seek(my_e_lfanew + 248, SeekOrigin.Begin);
+
+                for (int x = 0; x < numberofsections; x++)
+                {
+                    byte[] NewSectionName = Encoding.ASCII.GetBytes(RandomString(9));
+                    bw.Write(NewSectionName);
+                    // section names 32 bytes apart
+                    fs.Seek(32, SeekOrigin.Current);
+                }
+                bw.Close();
+                br.Close();
+                fs.Close();
             }
-            bw.Close();
-            br.Close();
-            fs.Close();
+            if (lolpe.FileHeader.Machine == 0x8664) // 64 bit
+            {
+                int numberofsections = lolpe.FileHeader.NumberOfSections;
+                FileStream fs = new FileStream(path, FileMode.Open);
+                BinaryReader br = new BinaryReader(fs);
+                BinaryWriter bw = new BinaryWriter(fs);
+                fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
+                Int64 my_e_lfanew = br.ReadInt64();
+                fs.Seek(my_e_lfanew + 248, SeekOrigin.Begin);
+
+                for (int x = 0; x < numberofsections; x++)
+                {
+                    byte[] NewSectionName = Encoding.ASCII.GetBytes(RandomString(9));
+                    bw.Write(NewSectionName);
+                    // section names 32 bytes apart
+                    fs.Seek(32, SeekOrigin.Current);
+                }
+                bw.Close();
+                br.Close();
+                fs.Close();
+            }
         }
 
         public void NullifyMZHeader(string path)
         {
-            FileStream fs = new FileStream(path, FileMode.Open);
-            BinaryReader br = new BinaryReader(fs);
-            byte[] nullmeout;
-            
-            fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
-            int my_e_lfanew;
-            my_e_lfanew = br.ReadInt32(); // number of bytes to stop at
-            fs.Seek(2, SeekOrigin.Begin); // skip MZ bytes
-            nullmeout = br.ReadBytes(my_e_lfanew);
-
-            for (int x = 0; x < nullmeout.Count() - 2; x++)
+            PeHeaderReader lolpe = new PeHeaderReader(path);
+            if (lolpe.FileHeader.Machine == 0x014C) // 32 bit
             {
-                if (x == 58)
-                {
-                    nullmeout[x] = (byte)my_e_lfanew; // save the e_lfanew value (60 -2 for MZ)
 
-                }
-                else
+                FileStream fs = new FileStream(path, FileMode.Open);
+                BinaryReader br = new BinaryReader(fs);
+                byte[] nullmeout;
+
+                fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
+                int my_e_lfanew;
+                my_e_lfanew = br.ReadInt32(); // number of bytes to stop at
+                fs.Seek(2, SeekOrigin.Begin); // skip MZ bytes
+                nullmeout = br.ReadBytes(my_e_lfanew);
+
+                for (int x = 0; x < nullmeout.Count() - 2; x++)
                 {
-                    nullmeout[x] = 0x00;
+                    if (x == 58)
+                    {
+                        nullmeout[x] = (byte)my_e_lfanew; // save the e_lfanew value (60 -2 for MZ)
+
+                    }
+                    else
+                    {
+                        nullmeout[x] = 0x00;
+                    }
                 }
+
+                fs.Seek(2, SeekOrigin.Begin);
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(nullmeout, 0, nullmeout.Count());
+                bw.Close();
+                br.Close();
+                fs.Close();
+            }
+            if (lolpe.FileHeader.Machine == 0x8664) // 64 bit
+            {
+                FileStream fs = new FileStream(path, FileMode.Open);
+                BinaryReader br = new BinaryReader(fs);
+                byte[] nullmeout;
+
+                fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
+                Int64 my_e_lfanew;
+                my_e_lfanew = br.ReadInt64(); // number of bytes to stop at
+                fs.Seek(2, SeekOrigin.Begin); // skip MZ bytes
+                nullmeout = br.ReadBytes((int)my_e_lfanew);
+
+                for (int x = 0; x < nullmeout.Count() - 2; x++)
+                {
+                    if (x == 58)
+                    {
+                        nullmeout[x] = (byte)my_e_lfanew; // save the e_lfanew value (60 -2 for MZ)
+
+                    }
+                    else
+                    {
+                        nullmeout[x] = 0x00;
+                    }
+                }
+
+                fs.Seek(2, SeekOrigin.Begin);
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(nullmeout, 0, nullmeout.Count());
+                bw.Close();
+                br.Close();
+                fs.Close();
             }
 
-            fs.Seek(2, SeekOrigin.Begin);
-            BinaryWriter bw = new BinaryWriter(fs);
-            bw.Write(nullmeout, 0, nullmeout.Count());
-            bw.Close();
-            br.Close();
-            fs.Close();
-           
         }
         public void ModTimeStamp(string path)
         {
-            Random rab = new Random((int)GetTickCount());
-            UInt32 timestamp = (UInt32)rab.Next(Int32.MinValue, Int32.MaxValue);
-            FileStream fs = new FileStream(path, FileMode.Open);
-            BinaryReader br = new BinaryReader(fs);
-            fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
-            int my_e_lfanew;
-            my_e_lfanew = br.ReadInt32(); // number of bytes to stop at
-            fs.Seek(0, SeekOrigin.Begin); // set position back to 0;
-            fs.Seek(my_e_lfanew + 8, SeekOrigin.Begin); // jump to offset of timestamp from PE file header which is 16 bytes past the e_lfanew value. 
-            BinaryWriter bw = new BinaryWriter(fs);
-            bw.Write(timestamp); // write the default for shits and giggles. 
-            bw.Close();
-            br.Close();
-            fs.Close();
+            PeHeaderReader lolpe = new PeHeaderReader(path);
+            if (lolpe.FileHeader.Machine == 0x014C) // 32 bit
+            {
+                Random rab = new Random((int)GetTickCount());
+                UInt32 timestamp = (UInt32)rab.Next(Int32.MinValue, Int32.MaxValue);
+                FileStream fs = new FileStream(path, FileMode.Open);
+                BinaryReader br = new BinaryReader(fs);
+                fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
+                int my_e_lfanew;
+                my_e_lfanew = br.ReadInt32(); // number of bytes to stop at
+                fs.Seek(0, SeekOrigin.Begin); // set position back to 0;
+                fs.Seek(my_e_lfanew + 8, SeekOrigin.Begin); // jump to offset of timestamp from PE file header which is 16 bytes past the e_lfanew value. 
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(timestamp); // write the default for shits and giggles. 
+                bw.Close();
+                br.Close();
+                fs.Close();
+            }
+            if (lolpe.FileHeader.Machine == 0x8664) // 64 bit
+            {
+                Random rab = new Random((int)GetTickCount());
+                UInt32 timestamp = (UInt32)rab.Next(Int32.MinValue, Int32.MaxValue);
+                FileStream fs = new FileStream(path, FileMode.Open);
+                BinaryReader br = new BinaryReader(fs);
+                fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
+                Int64 my_e_lfanew;
+                my_e_lfanew = br.ReadInt64(); // number of bytes to stop at
+                fs.Seek(0, SeekOrigin.Begin); // set position back to 0;
+                fs.Seek(my_e_lfanew + 8, SeekOrigin.Begin); // jump to offset of timestamp from PE file header which is 16 bytes past the e_lfanew value. 
+                BinaryWriter bw = new BinaryWriter(fs);
+                bw.Write(timestamp); // write the default for shits and giggles. 
+                bw.Close();
+                br.Close();
+                fs.Close();
+            }
         }
         public void InsertJunkBytes(string path)
         {
@@ -305,9 +390,9 @@ namespace Exe_Morphing_Util
         {
             PeHeaderReader lolpe = new PeHeaderReader(path);
             ushort pechar = lolpe.FileHeader.Characteristics;
-            if (pechar == 0xFFBF)
+            if (lolpe.FileHeader.Machine == 0x014C) // 32 bit
             {
-                ushort characteristic = 0x3022;
+                ushort characteristic = 0x042f;
 
                 FileStream fs = new FileStream(path, FileMode.Open);
                 BinaryReader br = new BinaryReader(fs);
@@ -325,16 +410,16 @@ namespace Exe_Morphing_Util
                 fs.Close();
             }
 
-            if (pechar == 0xDFBF)
+            if (lolpe.FileHeader.Machine == 0x8664) // 64 bit
             {
-                
-                ushort characteristic = 0x1022;
+
+                ushort characteristic = 0x042f;
                 
                 FileStream fs = new FileStream(path, FileMode.Open);
                 BinaryReader br = new BinaryReader(fs);
                 fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
-                int my_e_lfanew;
-                my_e_lfanew = br.ReadInt32(); // number of bytes to stop at
+                Int64 my_e_lfanew;
+                my_e_lfanew = br.ReadInt64(); // number of bytes to stop at
 
                 fs.Seek(0, SeekOrigin.Begin); // set position back to 0;
                 fs.Seek(my_e_lfanew + 22, SeekOrigin.Begin); // jump to offset of characteristics from PE file header which is 16 bytes past the e_lfanew value. 
@@ -345,30 +430,7 @@ namespace Exe_Morphing_Util
                 br.Close();
                 fs.Close();
             }
-            else
-            {
-                
-                // write new characteristics
-                ushort characteristic = 0xDFBF; //  set all flags except (dll)
-                if (path.Contains(".dll"))
-                {
-                    characteristic = 0xFFBF;
-                }
-                // ushort characteristic = 0xDFBF // set them all
-                FileStream fs = new FileStream(path, FileMode.Open);
-                BinaryReader br = new BinaryReader(fs);
-                fs.Seek(0x3c, SeekOrigin.Begin); // go to the value of e_lfanew
-                int my_e_lfanew;
-                my_e_lfanew = br.ReadInt32(); // number of bytes to stop at
-                fs.Seek(0, SeekOrigin.Begin); // set position back to 0;
-                fs.Seek(my_e_lfanew + 22, SeekOrigin.Begin); // jump to offset of characteristics from PE file header which is 16 bytes past the e_lfanew value. 
-                BinaryWriter bw = new BinaryWriter(fs);
-               
-                bw.Write(characteristic); // write the default for shits and giggles. 
-                bw.Close();
-                br.Close();
-                fs.Close();
-            }
+
 
         }
         public void WriteCharsToRsc(string path) // lets work this out
@@ -427,6 +489,7 @@ namespace Exe_Morphing_Util
 
             PeHeaderReader lolpe = new PeHeaderReader(path);
             UInt32 entrypointondisk = lolpe.ImageSectionHeaders[0].PointerToRawData;
+            
             UInt32 stoppoint = lolpe.ImageSectionHeaders[0].SizeOfRawData;
             FileStream fs = new FileStream(path, FileMode.Open);
             fs.Seek(entrypointondisk, SeekOrigin.Current);

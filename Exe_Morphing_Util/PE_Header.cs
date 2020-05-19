@@ -432,6 +432,7 @@ namespace Exe_Morphing_Util
                 {
                     imageSectionHeaders[headerNo] = FromBinaryReader<IMAGE_SECTION_HEADER>(reader);
                 }
+                stream.Close();
 
             }
         }

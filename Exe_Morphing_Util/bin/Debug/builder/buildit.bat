@@ -10,4 +10,5 @@ polink.exe -subsystem:windows -machine:X86 -largeaddressaware -base:0x10000 kern
 
 
 echo Payload sucessfully built and saved to G:\C Projects\Visual Studio\Projects\Exe_Morphing_Util\Exe_Morphing_Util\bin\Debug\output_dir\gogopowerrangers.exe
+Original EXE unchanged is in the folder you left it as G:\downloads\mimikatz_trunk\merk.exe.bak
 pause
