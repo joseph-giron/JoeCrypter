@@ -1274,7 +1274,7 @@ namespace Exe_Morphing_Util
             // link
             sw.WriteLine(linkexe + " -subsystem:windows -machine:x64 -largeaddressaware " +
                 "-base:0x10000 kernel32.lib user32.lib gdi32.lib comctl32.lib comdlg32.lib Rpcrt4.lib " +
-                "winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib -out:\"" + finalexe + "\" \"" + objpath + "\" \"" + rsrs2 + "\"");
+                "winmm.lib oleaut32.lib ole32.lib wbemuuid.lib Advapi32.lib longstall.obj  -out:\"" + finalexe + "\" \"" + objpath + "\" \"" + rsrs2 + "\"");
             sw.WriteLine("\r\n");
             /*
             sw.WriteLine(":::       _             _____                  _            ");
