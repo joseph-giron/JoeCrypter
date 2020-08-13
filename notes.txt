@@ -1,0 +1,2 @@
+https://docs.microsoft.com/en-us/windows/win32/power/registering-for-power-events
+integrate this
