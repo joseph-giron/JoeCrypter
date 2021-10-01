@@ -53,3 +53,15 @@ G:\C Projects\Visual Studio\Projects\Exe_Morphing_Util\new_editon_2_features\Exe
 G:\C Projects\Visual Studio\Projects\Exe_Morphing_Util\new_editon_2_features\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Exe_Morphing_Util.csproj.ResolveComReference.cache
 G:\C Projects\Visual Studio\Projects\Exe_Morphing_Util\new_editon_2_features\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\JoeCrypter.exe
 G:\C Projects\Visual Studio\Projects\Exe_Morphing_Util\new_editon_2_features\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\JoeCrypter.pdb
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Exe_Morphing_Util.csprojAssemblyReference.cache
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Exe_Morphing_Util.csproj.ResolveComReference.cache
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Exe_Morphing_Util.AboutForm.resources
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Exe_Morphing_Util.FormMain.resources
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Exe_Morphing_Util.Properties.Resources.resources
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Exe_Morphing_Util.csproj.GenerateResource.cache
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Exe_Morphing_Util.csproj.CoreCompileInputs.cache
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\JoeCrypter.exe
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\JoeCrypter.pdb
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\bin\Debug\JoeCrypter.exe
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\bin\Debug\JoeCrypter.pdb
+A:\C Projects\Visual Studio\Exe_Morphing_Util\Exe_Morphing_Util\obj\x86\Debug\Interop.WMPLib.dll

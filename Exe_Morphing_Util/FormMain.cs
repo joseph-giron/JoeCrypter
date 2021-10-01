@@ -1696,6 +1696,7 @@ namespace Exe_Morphing_Util
             rbUnpackMeth1.Checked = true;
             cbRegion.SelectedIndex = 2;
             dtp.Value = dtp.Value.AddDays(7);
+            
             WMPLib.WindowsMediaPlayer player = new WMPLib.WindowsMediaPlayer();
             if (devmode == false)
             {
