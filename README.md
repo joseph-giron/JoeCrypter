@@ -1,4 +1,4 @@
-****This gets picked up as wannacry now. Thanks to whoever did that. Might as well make it public again.
+This gets picked up as wannacry now. Thanks to whoever did that. Might as well make it public again
 
 
 ![Alt text](/screenshot.png?raw=true "Main Window")
