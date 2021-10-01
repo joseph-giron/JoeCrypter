@@ -1,7 +1,6 @@
-This gets picked up as wannacry now. Thanks to whoever did that. Might as well make it public again
+This gets picked up as wannacry now. Thanks to whoever did that. Might as well make it public again. 
 
-
-![Alt text](/screenshot.png?raw=true "Main Window")
+![Untitled](https://user-images.githubusercontent.com/1933739/135568562-c55ed2f9-3f02-4154-978a-b0c950894e62.png)
 
 This is for educational purposes only.
 To use, run it from the debug folder.
@@ -24,7 +23,6 @@ Things to be done still:
 * Implement other injection techniques like from this pro h4x0r https://modexp.wordpress.com/2019/06/15/4083/ - in progress
 * Add better music - done
 * Redesign UI - done
-* Make the encryption brute force itself maybe
-* Mimic ransomware behavior
-
-
+* Added transactional file execution
+* APC execution works, but buggy, left it out. Same with control-break execution method.
+* Make the encryption brute force itself rather than store key.
